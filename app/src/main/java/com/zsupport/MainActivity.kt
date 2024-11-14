@@ -14,43 +14,44 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
+        // Получаем ссылки на элементы из XML
+        val chineseButton = findViewById<Button>(R.id.chineseButton)
+        val englishButton = findViewById<Button>(R.id.englishButton)
+        val timezoneButton = findViewById<Button>(R.id.timezoneButton)
+        val timezoneSpinner = findViewById<Spinner>(R.id.timezoneSpinner)
+        val agreementCheckBox = findViewById<CheckBox>(R.id.checkBox)
+
+        // Начально деактивируем кнопки
+        chineseButton.isEnabled = false
+        englishButton.isEnabled = false
+        timezoneButton.isEnabled = false
+
+        // Настраиваем действие для чекбокса
+        agreementCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            // Активируем или деактивируем кнопки в зависимости от состояния чекбокса
+            chineseButton.isEnabled = isChecked
+            englishButton.isEnabled = isChecked
+            timezoneButton.isEnabled = isChecked
         }
 
-        val chineseButton = Button(this).apply {
-            text = "CHINESE"
-            setOnClickListener { changeSystemLanguage(Locale.CHINA) }
-        }
+        // Настраиваем действия для кнопок
+        chineseButton.setOnClickListener { changeSystemLanguage(Locale.CHINA) }
+        englishButton.setOnClickListener { changeSystemLanguage(Locale.ENGLISH) }
 
-        val englishButton = Button(this).apply {
-            text = "ENGLISH"
-            setOnClickListener { changeSystemLanguage(Locale.ENGLISH) }
-        }
-
-        // Создаем Spinner для выбора часового пояса
-        val timezoneSpinner = Spinner(this)
-        val timeZoneIds = TimeZone.getAvailableIDs().sorted() // Список всех доступных тайм-зон
+        // Заполняем Spinner доступными часовыми поясами
+        val timeZoneIds = TimeZone.getAvailableIDs().sorted()
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, timeZoneIds).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
         timezoneSpinner.adapter = adapter
 
-        val timezoneButton = Button(this).apply {
-            text = "Set Timezone"
-            setOnClickListener {
-                val selectedTimeZone = timezoneSpinner.selectedItem as String
-                changeSystemTimeZone(selectedTimeZone)
-            }
+        // Устанавливаем действие для кнопки изменения часового пояса
+        timezoneButton.setOnClickListener {
+            val selectedTimeZone = timezoneSpinner.selectedItem as String
+            changeSystemTimeZone(selectedTimeZone)
         }
-
-        layout.addView(chineseButton)
-        layout.addView(englishButton)
-        layout.addView(timezoneSpinner)
-        layout.addView(timezoneButton)
-        setContentView(layout)
     }
 
     private fun changeSystemLanguage(locale: Locale) {

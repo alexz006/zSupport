@@ -1,0 +1,93 @@
+<!-- res/layout/activity_main.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/mainLayoutPadding"
+    android:gravity="center_horizontal"
+    android:background="?attr/mainBackground">
+
+    <!-- Основной текст -->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="@dimen/boxAgreementTextWidth"
+        android:layout_height="wrap_content"
+        android:text="@string/boxAgreement"
+        android:textSize="@dimen/boxAgreementTextSize"
+        android:layout_marginBottom="@dimen/mainLayoutTopMargin"
+        android:layout_gravity="center_horizontal"
+        android:textColor="?attr/mainText"
+        android:justificationMode="inter_word"/>
+
+    <!-- Чекбокс с текстом "Я согласен" слева от него -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp">
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:layout_marginEnd="16dp"/>
+
+        <TextView
+            android:id="@+id/agreementText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/imAgreedText"
+            android:textSize="@dimen/boxAgreementTextSize"
+            android:textColor="?attr/mainText"
+            android:justificationMode="inter_word"/>
+    </LinearLayout>
+
+    <!-- Кнопка под чекбоксом -->
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/boxButtonText"
+        android:enabled="false"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/mainLayoutTopMargin"
+        android:textSize="@dimen/boxAgreementTextSize"/>
+
+    <!-- Кнопки для изменения языка -->
+    <Button
+        android:id="@+id/chineseButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CHINESE"
+        android:layout_marginTop="16dp"
+        android:textSize="@dimen/boxAgreementTextSize"/>
+
+    <Button
+        android:id="@+id/englishButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ENGLISH"
+        android:layout_marginTop="8dp"
+        android:textSize="@dimen/boxAgreementTextSize"/>
+
+    <!-- Spinner для выбора часового пояса -->
+    <Spinner
+        android:id="@+id/timezoneSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/boxAgreementTextSize"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Кнопка для установки часового пояса -->
+    <Button
+        android:id="@+id/timezoneButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set Timezone"
+        android:layout_marginTop="8dp"/>
+</LinearLayout>

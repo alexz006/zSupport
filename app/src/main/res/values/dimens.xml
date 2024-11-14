@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="boxAgreementTextSize">28sp</dimen>
+    <dimen name="mainLayoutMargin">12dp</dimen>
+    <dimen name="mainLayoutTopMargin">16dp</dimen>
+    <dimen name="mainLayoutPadding">32dp</dimen>
+    <dimen name="boxAgreementTextWidth">1200dp</dimen>
+</resources>
