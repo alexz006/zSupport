@@ -1,5 +1,6 @@
 package com.zsupport
 
+import android.annotation.SuppressLint
 import android.app.backup.BackupManager
 import android.content.res.Configuration
 import android.os.Bundle
@@ -13,6 +14,7 @@ import java.util.TimeZone
 
 class MainActivity : AppCompatActivity() {
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,10 +47,28 @@ class MainActivity : AppCompatActivity() {
 
         // Заполняем Spinner доступными часовыми поясами
         val timeZoneIds = TimeZone.getAvailableIDs().sorted()
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, timeZoneIds).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+
+        // Настройка адаптера с поиском
+        val adapter = ArrayAdapter(this, R.layout.custom_spinner_item, timeZoneIds).apply {
+            setDropDownViewResource(R.layout.custom_spinner_dropdown_item)
         }
+
         timezoneSpinner.adapter = adapter
+
+        timezoneSpinner.setOnTouchListener { _, _ ->
+            timezoneSpinner.isFocusableInTouchMode = true
+            false
+        }
+
+        val autoCompleteTextView = AutoCompleteTextView(this).apply {
+            threshold = 1 // Начинаем поиск после ввода первого символа
+            setAdapter(adapter)
+            setTextSize(16f)
+        }
+
+
+
 
         // Устанавливаем действие для кнопки изменения часового пояса
         timezoneButton.setOnClickListener {

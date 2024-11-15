@@ -18,6 +18,12 @@
         <item name="android:forceDarkAllowed">true</item>
     </style>
 
+    <style name="CustomSpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="android:background">@drawable/custom_spinner_background</item>
+        <item name="android:popupBackground">@drawable/custom_spinner_popup_background</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <!-- Style for Snackbar -->
     <color name="disabledText">#A8A8A8</color>
     <color name="white">#FFFFFF</color>
