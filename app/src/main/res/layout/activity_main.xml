@@ -18,7 +18,7 @@
         android:layout_marginBottom="@dimen/mainLayoutTopMargin"
         android:layout_gravity="center_horizontal"
         android:textColor="?attr/mainText"
-        android:justificationMode="inter_word"/>
+        android:justificationMode="inter_word" />
 
     <!-- Чекбокс с текстом "Я согласен" слева от него -->
     <LinearLayout
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:scaleX="1.5"
             android:scaleY="1.5"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="16dp" />
 
         <TextView
             android:id="@+id/agreementText"
@@ -44,50 +44,64 @@
             android:text="@string/imAgreedText"
             android:textSize="@dimen/boxAgreementTextSize"
             android:textColor="?attr/mainText"
-            android:justificationMode="inter_word"/>
+            android:justificationMode="inter_word" />
     </LinearLayout>
 
-    <!-- Кнопка под чекбоксом -->
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
+    <!-- Разделение экрана на две половины -->
+    <LinearLayout
+        android:layout_width="@dimen/boxAgreementTextWidth"
         android:layout_height="wrap_content"
-        android:text="@string/boxButtonText"
-        android:enabled="false"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/mainLayoutTopMargin"
-        android:textSize="@dimen/boxAgreementTextSize"/>
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/mainLayoutTopMargin">
 
-    <!-- Кнопки для изменения языка -->
-    <Button
-        android:id="@+id/chineseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CHINESE"
-        android:layout_marginTop="16dp"
-        android:textSize="@dimen/boxAgreementTextSize"/>
+        <!-- Левая половина с кнопками переключения языка -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/englishButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ENGLISH"
-        android:layout_marginTop="8dp"
-        android:textSize="@dimen/boxAgreementTextSize"/>
+            <Button
+                android:id="@+id/chineseButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CHINESE"
+                android:textSize="@dimen/boxAgreementTextSize"
+                android:layout_marginBottom="8dp" />
 
-    <!-- Spinner для выбора часового пояса -->
-    <Spinner
-        android:id="@+id/timezoneSpinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/boxAgreementTextSize"
-        android:layout_marginTop="16dp"/>
+            <Button
+                android:id="@+id/englishButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ENGLISH"
+                android:textSize="@dimen/boxAgreementTextSize" />
+        </LinearLayout>
 
-    <!-- Кнопка для установки часового пояса -->
-    <Button
-        android:id="@+id/timezoneButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set Timezone"
-        android:layout_marginTop="8dp"/>
+        <!-- Правая половина с Spinner и кнопкой изменения времени -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <Spinner
+                android:id="@+id/timezoneSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/boxAgreementTextSize"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/timezoneButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Set Timezone"
+                android:textSize="@dimen/boxAgreementTextSize" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 </LinearLayout>

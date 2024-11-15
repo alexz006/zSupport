@@ -28,6 +28,7 @@ android {
             )
 
             archivesName.set("zSupport-${defaultConfig.versionName}")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
