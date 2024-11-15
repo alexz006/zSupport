@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.zsupport.helpers.HoverUtils
 import java.util.Locale
 import java.util.TimeZone
 
@@ -22,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         val timezoneButton = findViewById<Button>(R.id.timezoneButton)
         val timezoneSpinner = findViewById<Spinner>(R.id.timezoneSpinner)
         val agreementCheckBox = findViewById<CheckBox>(R.id.checkBox)
+
+        HoverUtils().setHover(chineseButton, englishButton, timezoneButton)
 
         // Начально деактивируем кнопки
         chineseButton.isEnabled = false
