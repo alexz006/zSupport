@@ -51,21 +51,58 @@ class MainActivity : AppCompatActivity() {
             .sortedBy { TimeZone.getTimeZone(it.first).rawOffset } // Сортируем по смещению
             .map { it.second } // Оставляем только читаемый формат
 
-        // Настраиваем адаптер
-        val adapter = ArrayAdapter(this, R.layout.custom_spinner_item, readableTimeZones).apply {
-            setDropDownViewResource(R.layout.custom_spinner_dropdown_item)
+        val mutableTimeZoneIds = readableTimeZones.toMutableList() // Создаём изменяемую копию списка
+
+        val adapter = object : ArrayAdapter<String>(this, R.layout.custom_spinner_item, mutableTimeZoneIds) {
+            override fun getFilter(): Filter {
+                return object : Filter() {
+                    override fun performFiltering(constraint: CharSequence?): FilterResults {
+                        val filteredList = if (constraint.isNullOrEmpty()) {
+                            readableTimeZones
+                        } else {
+                            readableTimeZones.filter { it.contains(constraint, ignoreCase = true) }
+                        }
+
+                        return FilterResults().apply {
+                            values = filteredList
+                        }
+                    }
+
+
+                    @Suppress("UNCHECKED_CAST")
+                    override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                        val filteredList = results?.values as? List<String> ?: emptyList()
+                        clear() // Очищаем текущий список адаптера
+                        addAll(filteredList) // Добавляем отфильтрованные значения
+                        notifyDataSetChanged()
+                    }
+                }
+            }
         }
+
+
 
         val timezoneAutoComplete = findViewById<AutoCompleteTextView>(R.id.timezoneAutoComplete)
         timezoneAutoComplete.setAdapter(adapter)
         timezoneAutoComplete.threshold = 1 // Поиск начинается после ввода первого символа
 
-        // Устанавливаем действие для кнопки изменения часового пояса
         timezoneButton.setOnClickListener {
             val selectedTimeZoneDisplay = timezoneAutoComplete.text.toString()
-            val selectedTimeZoneId = timeZoneIds[readableTimeZones.indexOf(selectedTimeZoneDisplay)]
-            changeSystemTimeZone(selectedTimeZoneId)
+
+            // Получаем идентификатор таймзоны на основе читаемого формата
+            val selectedTimeZoneId = timeZoneIds.find { id ->
+                getReadableTimeZone(id) == selectedTimeZoneDisplay
+            }
+
+            if (selectedTimeZoneId != null) {
+                changeSystemTimeZone(selectedTimeZoneId)
+            } else {
+                Log.e("MainActivity", "Selected timezone not found in available IDs.")
+                Toast.makeText(this, "Invalid timezone selected", Toast.LENGTH_SHORT).show()
+            }
         }
+
+
 
     }
 
