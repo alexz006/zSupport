@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.backup.BackupManager
 import android.content.res.Configuration
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
 import android.widget.*
@@ -24,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         val englishButton = findViewById<Button>(R.id.englishButton)
         val agreementCheckBox = findViewById<CheckBox>(R.id.checkBox)
         val timezoneButton = findViewById<Button>(R.id.timezoneButton)
+        val autoDetectCheckbox = findViewById<CheckBox>(R.id.autoDetectTimezoneCheckbox)
+        val radioGroupTimezone = findViewById<RadioGroup>(R.id.radioGroupTimezone)
 
 
         HoverUtils().setHover(chineseButton, englishButton, timezoneButton)
@@ -95,14 +98,21 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (selectedTimeZoneId != null) {
-                changeSystemTimeZone(selectedTimeZoneId)
+                val isPermanent = radioGroupTimezone.checkedRadioButtonId == R.id.radioPermanent
+                if (isPermanent) {
+                    setSystemTimeZonePermanent(selectedTimeZoneId)
+                } else {
+                    changeSystemTimeZone(selectedTimeZoneId)
+                }
             } else {
                 Log.e("MainActivity", "Selected timezone not found in available IDs.")
                 Toast.makeText(this, "Invalid timezone selected", Toast.LENGTH_SHORT).show()
             }
         }
 
-
+        autoDetectCheckbox.setOnCheckedChangeListener { _, isChecked ->
+            setAutoTimeZoneEnabled(!isChecked)
+        }
 
     }
 
@@ -147,6 +157,43 @@ class MainActivity : AppCompatActivity() {
 
         } catch (e: Exception) {
             Log.e("MainActivity", "Failed to change timezone: ${e.message}", e)
+        }
+    }
+
+    private fun setSystemTimeZonePermanent(timeZoneId: String) {
+        Log.e("MainActivity", "Setting permanent system timezone to $timeZoneId")
+        try {
+            // Используем рефлексию для доступа к Settings.Global
+            val settingsGlobalClass = Class.forName("android.provider.Settings\$Global")
+            val putStringMethod = settingsGlobalClass.getDeclaredMethod(
+                "putString",
+                android.content.ContentResolver::class.java,
+                String::class.java,
+                String::class.java
+            )
+
+            // Вызываем метод putString через рефлексию
+            putStringMethod.invoke(null, contentResolver, "time_zone", timeZoneId)
+
+            // Уведомляем систему об изменении времени
+            val amnClass = Class.forName("android.app.AlarmManager")
+            val amnInstance = getSystemService(ALARM_SERVICE)
+            val setTimeZoneMethod = amnClass.getDeclaredMethod("setTimeZone", String::class.java)
+            setTimeZoneMethod.invoke(amnInstance, timeZoneId)
+
+            Log.e("MainActivity", "System timezone set permanently to $timeZoneId")
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to set timezone permanently: ${e.message}", e)
+        }
+    }
+
+
+    private fun setAutoTimeZoneEnabled(enabled: Boolean) {
+        try {
+            Settings.Global.putInt(contentResolver, Settings.Global.AUTO_TIME_ZONE, if (enabled) 1 else 0)
+            Log.e("MainActivity", "Auto timezone detection set to ${if (enabled) "enabled" else "disabled"}")
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to change auto timezone setting: ${e.message}", e)
         }
     }
 
