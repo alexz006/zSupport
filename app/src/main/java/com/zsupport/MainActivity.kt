@@ -94,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         val savedTimeZone = getTimeZoneFromPrefs()
         if (!savedTimeZone.isNullOrEmpty()) {
             timezoneAutoComplete.setText(getReadableTimeZone(savedTimeZone))
+            radioGroupTimezone.check(R.id.radioPermanent)
             Log.e("MainActivity", "Loaded saved timezone: $savedTimeZone")
         }
 
