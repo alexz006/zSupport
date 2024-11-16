@@ -22,9 +22,9 @@ class MainActivity : AppCompatActivity() {
         // Получаем ссылки на элементы из XML
         val chineseButton = findViewById<Button>(R.id.chineseButton)
         val englishButton = findViewById<Button>(R.id.englishButton)
-        val timezoneButton = findViewById<Button>(R.id.timezoneButton)
-        val timezoneSpinner = findViewById<Spinner>(R.id.timezoneSpinner)
         val agreementCheckBox = findViewById<CheckBox>(R.id.checkBox)
+        val timezoneButton = findViewById<Button>(R.id.timezoneButton)
+
 
         HoverUtils().setHover(chineseButton, englishButton, timezoneButton)
 
@@ -45,36 +45,28 @@ class MainActivity : AppCompatActivity() {
         chineseButton.setOnClickListener { changeSystemLanguage(Locale.CHINA) }
         englishButton.setOnClickListener { changeSystemLanguage(Locale.ENGLISH) }
 
-        // Заполняем Spinner доступными часовыми поясами
-        val timeZoneIds = TimeZone.getAvailableIDs().sorted()
+        val timeZoneIds = TimeZone.getAvailableIDs()
+        val readableTimeZones = timeZoneIds
+            .map { timeZoneId -> Pair(timeZoneId, getReadableTimeZone(timeZoneId)) } // Создаем пары (ID, читаемый формат)
+            .sortedBy { TimeZone.getTimeZone(it.first).rawOffset } // Сортируем по смещению
+            .map { it.second } // Оставляем только читаемый формат
 
-
-        // Настройка адаптера с поиском
-        val adapter = ArrayAdapter(this, R.layout.custom_spinner_item, timeZoneIds).apply {
+        // Настраиваем адаптер
+        val adapter = ArrayAdapter(this, R.layout.custom_spinner_item, readableTimeZones).apply {
             setDropDownViewResource(R.layout.custom_spinner_dropdown_item)
         }
 
-        timezoneSpinner.adapter = adapter
-
-        timezoneSpinner.setOnTouchListener { _, _ ->
-            timezoneSpinner.isFocusableInTouchMode = true
-            false
-        }
-
-        val autoCompleteTextView = AutoCompleteTextView(this).apply {
-            threshold = 1 // Начинаем поиск после ввода первого символа
-            setAdapter(adapter)
-            setTextSize(16f)
-        }
-
-
-
+        val timezoneAutoComplete = findViewById<AutoCompleteTextView>(R.id.timezoneAutoComplete)
+        timezoneAutoComplete.setAdapter(adapter)
+        timezoneAutoComplete.threshold = 1 // Поиск начинается после ввода первого символа
 
         // Устанавливаем действие для кнопки изменения часового пояса
         timezoneButton.setOnClickListener {
-            val selectedTimeZone = timezoneSpinner.selectedItem as String
-            changeSystemTimeZone(selectedTimeZone)
+            val selectedTimeZoneDisplay = timezoneAutoComplete.text.toString()
+            val selectedTimeZoneId = timeZoneIds[readableTimeZones.indexOf(selectedTimeZoneDisplay)]
+            changeSystemTimeZone(selectedTimeZoneId)
         }
+
     }
 
     private fun changeSystemLanguage(locale: Locale) {
@@ -119,5 +111,23 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("MainActivity", "Failed to change timezone: ${e.message}", e)
         }
+    }
+
+    // Функция для преобразования часового пояса в читаемый формат
+    fun getReadableTimeZone(timeZoneId: String): String {
+        val timeZone = TimeZone.getTimeZone(timeZoneId)
+        val offset = timeZone.rawOffset / (60 * 60 * 1000) // Смещение в часах
+        val offsetMinutes = Math.abs(timeZone.rawOffset / (60 * 1000) % 60) // Минуты для неполных часов
+        val offsetSign = if (offset >= 0) "+" else "-"
+        val gmtOffset = if (offsetMinutes > 0) {
+            "GMT$offsetSign$offset:${String.format("%02d", offsetMinutes)}"
+        } else {
+            "GMT$offsetSign$offset"
+        }
+
+        val cityName = timeZoneId.substringAfterLast('/') // Получаем название города/области
+            .replace('_', ' ') // Преобразуем подчеркивания в пробелы
+
+        return "$cityName ($gmtOffset)"
     }
 }

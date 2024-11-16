@@ -4,6 +4,7 @@
     <dimen name="mainLayoutMargin">12dp</dimen>
     <dimen name="mainLayoutTopMargin">16dp</dimen>
     <dimen name="mainLayoutPadding">32dp</dimen>
+    <dimen name="selectTimeZonePadding">12dp</dimen>
     <dimen name="boxAgreementTextWidth">1200dp</dimen>
     <dimen name="boxButtonWidth">350dp</dimen>
 </resources>

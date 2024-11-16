@@ -87,11 +87,22 @@
             android:orientation="vertical"
             android:gravity="center_horizontal">
 
-            <Spinner
-                android:id="@+id/timezoneSpinner"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/CustomSpinnerStyle" />
+                android:hint="Select Timezone"
+                android:padding="@dimen/selectTimeZonePadding"
+                android:layout_marginTop="@dimen/mainLayoutTopMargin">
+
+                <AutoCompleteTextView
+                    android:id="@+id/timezoneAutoComplete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/boxAgreementTextSize"
+                    android:padding="@dimen/selectTimeZonePadding"
+                    android:background="@drawable/custom_spinner_background" />
+            </com.google.android.material.textfield.TextInputLayout>
+
 
             <Button
                 android:id="@+id/timezoneButton"
