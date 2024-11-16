@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">zSupport</string>
-    <string name="boxAgreement">Управляя системными настройками из этого приложения, Вы точно уверены в своих действиях и осознаете возможные последствия к которым они могут привести. Любые изменения вносимые напрямую в системные параметры автомобиля - могут привести к сбоям, блокировкам либо полной неработоспособности отдельного ПО либо автомобиля, отсутствию обновлений, рассинхронизации данных и т.п. Нажимая на любые кнопки в этом приложении - Вы подтверждаете, что полностью осознаете написаное выше и самостоятельно отвечаете за свои действия и возможные их последствия.</string>
-    <string name="imAgreedText">Я согласен</string>
-    <string name="boxButtonText">Открыть инженерное меню</string>
+    <string name="boxAgreement">By managing system settings from this application, you confirm that you are fully aware of your actions and the potential consequences they may lead to. Any changes made directly to the system parameters of the vehicle may result in malfunctions, lockouts, or the complete inoperability of certain software or the vehicle itself, lack of updates, data desynchronization, and more. By clicking any buttons in this application, you acknowledge that you fully understand the above and accept full responsibility for your actions and their potential consequences.</string>
+    <string name="imAgreedText">I Agree</string>
 </resources>
