@@ -1,6 +1,7 @@
 <!-- res/layout/activity_main.xml -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -109,6 +110,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginTop="@dimen/mainLayoutMargin"
                 android:layout_marginBottom="8dp">
 
                 <RadioButton
@@ -124,6 +126,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Permanent Change"
+                    android:layout_marginTop="@dimen/mainLayoutMargin"
                     android:textSize="@dimen/boxAgreementTextSize" />
             </RadioGroup>
 
@@ -133,6 +136,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Disable Auto Timezone"
+                android:layout_marginTop="@dimen/mainLayoutMargin"
                 android:textSize="@dimen/boxAgreementTextSize"
                 android:layout_marginBottom="8dp" />
 
@@ -141,6 +145,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Set Timezone"
+                android:layout_marginTop="@dimen/mainLayoutMargin"
                 android:textSize="@dimen/boxAgreementTextSize" />
         </LinearLayout>
 

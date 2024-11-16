@@ -48,8 +48,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Настраиваем действия для кнопок
-        chineseButton.setOnClickListener { changeSystemLanguage(Locale.CHINA) }
-        englishButton.setOnClickListener { changeSystemLanguage(Locale.ENGLISH) }
+        chineseButton.setOnClickListener {
+            changeSystemLanguage(Locale.CHINA)
+            hideKeyboard()
+        }
+        englishButton.setOnClickListener {
+            changeSystemLanguage(Locale.ENGLISH)
+            hideKeyboard()
+        }
 
         val timeZoneIds = TimeZone.getAvailableIDs()
         val readableTimeZones = timeZoneIds
@@ -99,6 +105,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         timezoneButton.setOnClickListener {
+
+            hideKeyboard()
+
             val selectedTimeZoneDisplay = timezoneAutoComplete.text.toString()
 
             // Получаем идентификатор таймзоны на основе читаемого формата
@@ -123,6 +132,11 @@ class MainActivity : AppCompatActivity() {
 
         autoDetectCheckbox.setOnCheckedChangeListener { _, isChecked ->
             setAutoTimeZoneEnabled(!isChecked)
+        }
+
+        findViewById<LinearLayout>(R.id.rootLayout).setOnTouchListener { _, _ ->
+            hideKeyboard()
+            false
         }
 
     }
@@ -262,5 +276,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun hideKeyboard() {
+        val view = this.currentFocus
+        if (view != null) {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
 
 }
