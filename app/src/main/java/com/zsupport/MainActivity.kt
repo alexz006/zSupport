@@ -2,6 +2,9 @@ package com.zsupport
 
 import android.annotation.SuppressLint
 import android.app.backup.BackupManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.provider.Settings
@@ -84,10 +87,15 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
         val timezoneAutoComplete = findViewById<AutoCompleteTextView>(R.id.timezoneAutoComplete)
         timezoneAutoComplete.setAdapter(adapter)
         timezoneAutoComplete.threshold = 1 // Поиск начинается после ввода первого символа
+
+        val savedTimeZone = getTimeZoneFromPrefs()
+        if (!savedTimeZone.isNullOrEmpty()) {
+            timezoneAutoComplete.setText(getReadableTimeZone(savedTimeZone))
+            Log.e("MainActivity", "Loaded saved timezone: $savedTimeZone")
+        }
 
         timezoneButton.setOnClickListener {
             val selectedTimeZoneDisplay = timezoneAutoComplete.text.toString()
@@ -101,8 +109,10 @@ class MainActivity : AppCompatActivity() {
                 val isPermanent = radioGroupTimezone.checkedRadioButtonId == R.id.radioPermanent
                 if (isPermanent) {
                     setSystemTimeZonePermanent(selectedTimeZoneId)
+                    saveTimeZoneToPrefs(selectedTimeZoneId)
                 } else {
                     changeSystemTimeZone(selectedTimeZoneId)
+                    clearTimeZonePrefs()
                 }
             } else {
                 Log.e("MainActivity", "Selected timezone not found in available IDs.")
@@ -214,4 +224,42 @@ class MainActivity : AppCompatActivity() {
 
         return "$cityName ($gmtOffset)"
     }
+
+    private fun saveTimeZoneToPrefs(timeZoneId: String) {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        prefs.edit().putString("selected_time_zone", timeZoneId).apply()
+        Log.e("MainActivity", "TimeZone saved to prefs: $timeZoneId")
+    }
+
+    private fun getTimeZoneFromPrefs(): String? {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        return prefs.getString("selected_time_zone", null)
+    }
+
+    private fun clearTimeZonePrefs() {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        prefs.edit().remove("selected_time_zone").apply()
+    }
+
+    class TimeZoneSyncReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
+                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                val selectedTimeZone = prefs.getString("selected_time_zone", null)
+
+                if (!selectedTimeZone.isNullOrEmpty()) {
+                    try {
+                        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+                        val setTimeZoneMethod = android.app.AlarmManager::class.java.getDeclaredMethod("setTimeZone", String::class.java)
+                        setTimeZoneMethod.invoke(alarmManager, selectedTimeZone)
+
+                        Log.e("TimeZoneSyncReceiver", "Time zone synchronized to $selectedTimeZone")
+                    } catch (e: Exception) {
+                        Log.e("TimeZoneSyncReceiver", "Failed to synchronize time zone: ${e.message}", e)
+                    }
+                }
+            }
+        }
+    }
+
 }
