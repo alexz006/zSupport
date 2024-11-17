@@ -8,6 +8,13 @@ import android.util.Log
 
 object AppHelper {
 
+    private val packagePermissionsMap = mutableMapOf(
+        "com.anyapp.store" to listOf("REQUEST_INSTALL_PACKAGES"),
+        "com.anyapp.zee.store" to listOf("REQUEST_INSTALL_PACKAGES"),
+        "ru.vk.store" to listOf("REQUEST_INSTALL_PACKAGES"),
+        "air.StrelkaHUDFREE" to listOf("android.permission.SYSTEM_ALERT_WINDOW", "deviceidle whitelist")
+    )
+
     // Получить список запущенных приложений
     fun getRunningApps(context: Context): List<String> {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
