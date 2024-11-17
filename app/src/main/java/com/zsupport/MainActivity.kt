@@ -19,6 +19,8 @@ import java.util.Locale
 import java.util.TimeZone
 
 class MainActivity : AppCompatActivity() {
+    
+    val TAG = "AnyAppSupport"
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,13 +56,13 @@ class MainActivity : AppCompatActivity() {
         // Настраиваем действие для чекбокса
         agreementCheckBox.setOnCheckedChangeListener { _, isChecked ->
             // Активируем или деактивируем кнопки в зависимости от состояния чекбокса
-            chineseButton.isEnabled = isChecked
-            englishButton.isEnabled = isChecked
-            timezoneButton.isEnabled = isChecked
-            clearCacheButton.isEnabled = isChecked
-            clearDataButton.isEnabled = isChecked
-            forceStopButton.isEnabled = isChecked
-            rebootButton.isEnabled = isChecked
+            updateButtonState(chineseButton, isChecked)
+            updateButtonState(englishButton, isChecked)
+            updateButtonState(timezoneButton, isChecked)
+            updateButtonState(clearCacheButton, isChecked)
+            updateButtonState(clearDataButton, isChecked)
+            updateButtonState(forceStopButton, isChecked)
+            updateButtonState(rebootButton, isChecked)
         }
 
         // Настраиваем действия для кнопок
@@ -74,6 +76,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         val timeZoneIds = TimeZone.getAvailableIDs()
+
+        Log.i(TAG, "Timezone IDs: ${timeZoneIds.size}")
+        Log.i(TAG, "Timezone IDs: ${timeZoneIds}")
+
         val readableTimeZones = timeZoneIds
             .map { timeZoneId -> Pair(timeZoneId, getReadableTimeZone(timeZoneId)) } // Создаем пары (ID, читаемый формат)
             .sortedBy { TimeZone.getTimeZone(it.first).rawOffset } // Сортируем по смещению
@@ -117,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         if (!savedTimeZone.isNullOrEmpty()) {
             timezoneAutoComplete.setText(getReadableTimeZone(savedTimeZone))
             radioGroupTimezone.check(R.id.radioPermanent)
-            Log.e("MainActivity", "Loaded saved timezone: $savedTimeZone")
+            Log.i(TAG, "Loaded saved timezone: $savedTimeZone")
         }
 
         timezoneButton.setOnClickListener {
@@ -141,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                     clearTimeZonePrefs()
                 }
             } else {
-                Log.e("MainActivity", "Selected timezone not found in available IDs.")
+                Log.e(TAG, "Selected timezone not found in available IDs.")
                 Toast.makeText(this, "Invalid timezone selected", Toast.LENGTH_SHORT).show()
             }
         }
@@ -184,7 +190,7 @@ class MainActivity : AppCompatActivity() {
                 AppHelper.clearAppCache(this, selectedPackage)
                 Toast.makeText(this, "Cache cleared for $selectedAppName", Toast.LENGTH_SHORT).show()
             } else {
-                Log.e("MainActivity", "App not found: $selectedAppName")
+                Log.e(TAG, "App not found: $selectedAppName")
                 Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
             }
         }
@@ -197,7 +203,7 @@ class MainActivity : AppCompatActivity() {
                 AppHelper.clearAppData(this, selectedPackage)
                 Toast.makeText(this, "Data cleared for $selectedAppName", Toast.LENGTH_SHORT).show()
             } else {
-                Log.e("MainActivity", "App not found: $selectedAppName")
+                Log.e(TAG, "App not found: $selectedAppName")
                 Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
             }
         }
@@ -210,7 +216,7 @@ class MainActivity : AppCompatActivity() {
                 AppHelper.forceStopApp(this, selectedPackage)
                 Toast.makeText(this, "App stopped: $selectedAppName", Toast.LENGTH_SHORT).show()
             } else {
-                Log.e("MainActivity", "App not found: $selectedAppName")
+                Log.e(TAG, "App not found: $selectedAppName")
                 Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
             }
         }
@@ -219,7 +225,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeSystemLanguage(locale: Locale) {
-        Log.e("MainActivity", "Changing system language to $locale")
+        Log.i(TAG, "Changing system language to $locale")
 
         try {
             val amnClass = Class.forName("android.app.ActivityManagerNative")
@@ -237,15 +243,15 @@ class MainActivity : AppCompatActivity() {
                 .invoke(amnInstance, config)
 
             BackupManager.dataChanged("com.android.providers.settings")
-            Log.e("MainActivity", "System language updated successfully.")
+            Log.i(TAG, "System language updated successfully.")
 
         } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to change language: ${e.message}", e)
+            Log.e(TAG, "Failed to change language: ${e.message}", e)
         }
     }
 
     private fun changeSystemTimeZone(timeZoneId: String) {
-        Log.e("MainActivity", "Changing system timezone to $timeZoneId")
+        Log.i(TAG, "Changing system timezone to $timeZoneId")
 
         try {
             val alarmManagerClass = Class.forName("android.app.AlarmManager")
@@ -255,15 +261,15 @@ class MainActivity : AppCompatActivity() {
             setTimeZoneMethod.invoke(alarmManager, timeZoneId)
 
             BackupManager.dataChanged("com.android.providers.settings")
-            Log.e("MainActivity", "System timezone updated successfully to $timeZoneId")
+            Log.i(TAG, "System timezone updated successfully to $timeZoneId")
 
         } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to change timezone: ${e.message}", e)
+            Log.e(TAG, "Failed to change timezone: ${e.message}", e)
         }
     }
 
     private fun setSystemTimeZonePermanent(timeZoneId: String) {
-        Log.e("MainActivity", "Setting permanent system timezone to $timeZoneId")
+        Log.i(TAG, "Setting permanent system timezone to $timeZoneId")
         try {
             // Используем рефлексию для доступа к Settings.Global
             val settingsGlobalClass = Class.forName("android.provider.Settings\$Global")
@@ -283,9 +289,9 @@ class MainActivity : AppCompatActivity() {
             val setTimeZoneMethod = amnClass.getDeclaredMethod("setTimeZone", String::class.java)
             setTimeZoneMethod.invoke(amnInstance, timeZoneId)
 
-            Log.e("MainActivity", "System timezone set permanently to $timeZoneId")
+            Log.i(TAG, "System timezone set permanently to $timeZoneId")
         } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to set timezone permanently: ${e.message}", e)
+            Log.e(TAG, "Failed to set timezone permanently: ${e.message}", e)
         }
     }
 
@@ -293,9 +299,9 @@ class MainActivity : AppCompatActivity() {
     private fun setAutoTimeZoneEnabled(enabled: Boolean) {
         try {
             Settings.Global.putInt(contentResolver, Settings.Global.AUTO_TIME_ZONE, if (enabled) 1 else 0)
-            Log.e("MainActivity", "Auto timezone detection set to ${if (enabled) "enabled" else "disabled"}")
+            Log.i(TAG, "Auto timezone detection set to ${if (enabled) "enabled" else "disabled"}")
         } catch (e: Exception) {
-            Log.e("MainActivity", "Failed to change auto timezone setting: ${e.message}", e)
+            Log.e(TAG, "Failed to change auto timezone setting: ${e.message}", e)
         }
     }
 
@@ -314,13 +320,15 @@ class MainActivity : AppCompatActivity() {
         val cityName = timeZoneId.substringAfterLast('/') // Получаем название города/области
             .replace('_', ' ') // Преобразуем подчеркивания в пробелы
 
+        //Log.i(TAG, "CityName: $cityName GMT: $gmtOffset")
+
         return "$cityName ($gmtOffset)"
     }
 
     private fun saveTimeZoneToPrefs(timeZoneId: String) {
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         prefs.edit().putString("selected_time_zone", timeZoneId).apply()
-        Log.e("MainActivity", "TimeZone saved to prefs: $timeZoneId")
+        Log.i(TAG, "TimeZone saved to prefs: $timeZoneId")
     }
 
     private fun getTimeZoneFromPrefs(): String? {
@@ -334,6 +342,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     class TimeZoneSyncReceiver : BroadcastReceiver() {
+
+        val TAG = "AnyAppSupport"
+
         override fun onReceive(context: Context, intent: Intent?) {
             if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
                 val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
@@ -345,9 +356,9 @@ class MainActivity : AppCompatActivity() {
                         val setTimeZoneMethod = android.app.AlarmManager::class.java.getDeclaredMethod("setTimeZone", String::class.java)
                         setTimeZoneMethod.invoke(alarmManager, selectedTimeZone)
 
-                        Log.e("TimeZoneSyncReceiver", "Time zone synchronized to $selectedTimeZone")
+                        Log.i(TAG, "Time zone synchronized to $selectedTimeZone")
                     } catch (e: Exception) {
-                        Log.e("TimeZoneSyncReceiver", "Failed to synchronize time zone: ${e.message}", e)
+                        Log.e(TAG, "Failed to synchronize time zone: ${e.message}", e)
                     }
                 }
             }
@@ -361,6 +372,14 @@ class MainActivity : AppCompatActivity() {
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
+
+
+    private fun updateButtonState(button: Button, isEnabled: Boolean) {
+        button.isEnabled = isEnabled
+        val style = if (isEnabled) R.style.CustomButtonStyle else R.style.CustomOFFButtonStyle
+        button.setTextAppearance(this, style)
+    }
+
 
 
 }

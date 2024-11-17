@@ -7,4 +7,6 @@
     <dimen name="selectTimeZonePadding">12dp</dimen>
     <dimen name="boxAgreementTextWidth">1200dp</dimen>
     <dimen name="boxButtonWidth">350dp</dimen>
+    <dimen name="buttonsCornerRadius">12dp</dimen>
+    <dimen name="mainSmallMargin">8dp</dimen>
 </resources>

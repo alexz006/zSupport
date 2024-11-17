@@ -39,7 +39,7 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="@dimen/mainLayoutTopMargin">
 
                 <CheckBox
                     android:id="@+id/checkBox"
@@ -47,7 +47,7 @@
                     android:layout_height="wrap_content"
                     android:scaleX="1.5"
                     android:scaleY="1.5"
-                    android:layout_marginEnd="16dp" />
+                    android:layout_marginEnd="@dimen/mainLayoutTopMargin" />
 
                 <TextView
                     android:id="@+id/agreementText"
@@ -80,15 +80,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CHINESE"
-                        android:textSize="@dimen/boxAgreementTextSize"
-                        android:layout_marginBottom="8dp" />
+                        style="@style/CustomOFFButtonStyle"
+                        android:layout_marginBottom="@dimen/mainSmallMargin" />
 
                     <Button
                         android:id="@+id/englishButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ENGLISH"
-                        android:textSize="@dimen/boxAgreementTextSize" />
+                        style="@style/CustomOFFButtonStyle" />
                 </LinearLayout>
 
                 <!-- Правая половина с Spinner и кнопкой изменения времени -->
@@ -112,6 +112,8 @@
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/boxAgreementTextSize"
                             android:padding="@dimen/selectTimeZonePadding"
+                            android:imeOptions="flagNoFullscreen"
+                            android:inputType="textNoSuggestions"
                             android:background="@drawable/custom_spinner_background" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -121,7 +123,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_marginTop="@dimen/mainLayoutMargin"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="@dimen/mainSmallMargin">
 
                         <RadioButton
                             android:id="@+id/radioTemporary"
@@ -147,15 +149,15 @@
                         android:text="Disable Auto Timezone"
                         android:layout_marginTop="@dimen/mainLayoutMargin"
                         android:textSize="@dimen/boxAgreementTextSize"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="@dimen/mainSmallMargin" />
 
                     <Button
                         android:id="@+id/timezoneButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Set Timezone"
-                        android:layout_marginTop="@dimen/mainLayoutMargin"
-                        android:textSize="@dimen/boxAgreementTextSize" />
+                        style="@style/CustomOFFButtonStyle"
+                        android:layout_marginTop="@dimen/mainLayoutMargin" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
@@ -182,6 +184,8 @@
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/boxAgreementTextSize"
                     android:padding="@dimen/selectTimeZonePadding"
+                    android:imeOptions="flagNoFullscreen"
+                    android:inputType="textNoSuggestions"
                     android:background="@drawable/custom_spinner_background" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -198,23 +202,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Clear Cache"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="@dimen/boxAgreementTextSize" />
+                    android:layout_marginEnd="@dimen/mainLayoutMargin"
+                    style="@style/CustomOFFButtonStyle" />
 
                 <Button
                     android:id="@+id/clearDataButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Clear Data"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="@dimen/boxAgreementTextSize" />
+                    android:layout_marginEnd="@dimen/mainLayoutMargin"
+                    style="@style/CustomOFFButtonStyle" />
 
                 <Button
                     android:id="@+id/forceStopButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Force Stop"
-                    android:textSize="@dimen/boxAgreementTextSize" />
+                    style="@style/CustomOFFButtonStyle" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -228,6 +232,6 @@
         android:textColor="@android:color/white"
         android:background="#8B0000"
         android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
-        android:padding="8dp" />
+        android:layout_margin="@dimen/mainLayoutPadding"
+        android:padding="@dimen/mainLayoutPadding" />
 </FrameLayout>

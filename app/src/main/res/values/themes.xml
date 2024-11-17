@@ -24,6 +24,25 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <!-- Общий стиль для кнопок -->
+    <style name="CustomButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/custom_button_background</item>
+        <item name="android:textColor">#DADADA</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:width">200dp</item>
+        <item name="android:height">100dp</item>
+    </style>
+
+    <style name="CustomOFFButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/custom_button_off_background</item>
+        <item name="android:textColor">#AAAAAA</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:width">200dp</item>
+        <item name="android:height">100dp</item>
+    </style>
+
     <!-- Style for Snackbar -->
     <color name="disabledText">#A8A8A8</color>
     <color name="white">#FFFFFF</color>
