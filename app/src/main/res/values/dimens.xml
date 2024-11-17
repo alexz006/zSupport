@@ -5,8 +5,11 @@
     <dimen name="mainLayoutTopMargin">16dp</dimen>
     <dimen name="mainLayoutPadding">32dp</dimen>
     <dimen name="selectTimeZonePadding">12dp</dimen>
+    <dimen name="buttonsMainPadding">8dp</dimen>
     <dimen name="boxAgreementTextWidth">1200dp</dimen>
     <dimen name="boxButtonWidth">350dp</dimen>
     <dimen name="buttonsCornerRadius">12dp</dimen>
+    <dimen name="buttonsMainWidth">200dp</dimen>
+    <dimen name="buttonsMainHight">100dp</dimen>
     <dimen name="mainSmallMargin">8dp</dimen>
 </resources>

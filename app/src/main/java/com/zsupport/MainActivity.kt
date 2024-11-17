@@ -366,10 +366,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun updateButtonState(button: Button, isEnabled: Boolean) {
         button.isEnabled = isEnabled
         val style = if (isEnabled) R.style.CustomButtonStyle else R.style.CustomOFFButtonStyle
         button.setTextAppearance(this, style)
+        button.background = getDrawable(if (isEnabled) R.drawable.custom_button_background else R.drawable.custom_button_off_background)
     }
 
 

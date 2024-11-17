@@ -28,19 +28,19 @@
     <style name="CustomButtonStyle" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/custom_button_background</item>
         <item name="android:textColor">#DADADA</item>
-        <item name="android:textSize">28sp</item>
-        <item name="android:padding">8dp</item>
-        <item name="android:width">200dp</item>
-        <item name="android:height">100dp</item>
+        <item name="android:textSize">@dimen/boxAgreementTextSize</item>
+        <item name="android:padding">@dimen/buttonsMainPadding</item>
+        <item name="android:width">@dimen/buttonsMainWidth</item>
+        <item name="android:height">@dimen/buttonsMainHight</item>
     </style>
 
     <style name="CustomOFFButtonStyle" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/custom_button_off_background</item>
         <item name="android:textColor">#AAAAAA</item>
-        <item name="android:textSize">28sp</item>
-        <item name="android:padding">8dp</item>
-        <item name="android:width">200dp</item>
-        <item name="android:height">100dp</item>
+        <item name="android:textSize">@dimen/boxAgreementTextSize</item>
+        <item name="android:padding">@dimen/buttonsMainPadding</item>
+        <item name="android:width">@dimen/buttonsMainWidth</item>
+        <item name="android:height">@dimen/buttonsMainHight</item>
     </style>
 
     <!-- Style for Snackbar -->
