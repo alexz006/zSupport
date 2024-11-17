@@ -222,17 +222,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
         val statusTextView = findViewById<TextView>(R.id.statusTextView)
         val permissionsHelper = PermissionsHelper()
 
         val installedApps = AppHelper.getInstalledApps(this).map { it.first }
 
-        // Перебираем мапу и проверяем установленные приложения
         val statusBuilder = StringBuilder()
         appNamesToPackages.forEach { (appName, packageName) ->
             if (installedApps.contains(packageName)) {
                 permissionsHelper.applyPermissions(this, packageName)
-
                 statusBuilder.append("$appName: найден. Права: выданы.\n")
                 Log.i(TAG, "$appName ($packageName) найден. Права выданы.")
             } else {
@@ -241,10 +244,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Отображаем статус
         statusTextView.text = statusBuilder.toString().trim()
-
     }
+
 
     private fun changeSystemLanguage(locale: Locale) {
         Log.i(TAG, "Changing system language to $locale")
