@@ -46,6 +46,10 @@ class MainActivity : AppCompatActivity() {
         chineseButton.isEnabled = false
         englishButton.isEnabled = false
         timezoneButton.isEnabled = false
+        clearCacheButton.isEnabled = false
+        clearDataButton.isEnabled = false
+        forceStopButton.isEnabled = false
+        rebootButton.isEnabled = false
 
         // Настраиваем действие для чекбокса
         agreementCheckBox.setOnCheckedChangeListener { _, isChecked ->
@@ -53,6 +57,10 @@ class MainActivity : AppCompatActivity() {
             chineseButton.isEnabled = isChecked
             englishButton.isEnabled = isChecked
             timezoneButton.isEnabled = isChecked
+            clearCacheButton.isEnabled = isChecked
+            clearDataButton.isEnabled = isChecked
+            forceStopButton.isEnabled = isChecked
+            rebootButton.isEnabled = isChecked
         }
 
         // Настраиваем действия для кнопок
