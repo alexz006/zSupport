@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         val timezoneButton = findViewById<Button>(R.id.timezoneButton)
         val autoDetectCheckbox = findViewById<CheckBox>(R.id.autoDetectTimezoneCheckbox)
         val radioGroupTimezone = findViewById<RadioGroup>(R.id.radioGroupTimezone)
+        val rebootButton = findViewById<Button>(R.id.rebootButton)
 
 
         HoverUtils().setHover(chineseButton, englishButton, timezoneButton)
@@ -138,6 +139,16 @@ class MainActivity : AppCompatActivity() {
             hideKeyboard()
             false
         }
+
+        rebootButton.setOnClickListener {
+            try {
+                val pm = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+                pm.reboot(null)
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Failed to reboot: ${e.message}", e)
+            }
+        }
+
 
     }
 

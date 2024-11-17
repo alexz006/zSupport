@@ -1,4 +1,3 @@
-<!-- res/layout/activity_main.xml -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rootLayout"
@@ -104,7 +103,6 @@
                     android:background="@drawable/custom_spinner_background" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Радиогруппа для выбора способа изменения тайм-зоны -->
             <RadioGroup
                 android:id="@+id/radioGroupTimezone"
                 android:layout_width="match_parent"
@@ -130,7 +128,6 @@
                     android:textSize="@dimen/boxAgreementTextSize" />
             </RadioGroup>
 
-            <!-- Чекбокс для выключения автоопределения тайм-зоны -->
             <CheckBox
                 android:id="@+id/autoDetectTimezoneCheckbox"
                 android:layout_width="wrap_content"
@@ -148,7 +145,17 @@
                 android:layout_marginTop="@dimen/mainLayoutMargin"
                 android:textSize="@dimen/boxAgreementTextSize" />
         </LinearLayout>
-
     </LinearLayout>
 
+    <!-- Кнопка REBOOT -->
+    <Button
+        android:id="@+id/rebootButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="REBOOT"
+        android:textColor="@android:color/white"
+        android:background="#8B0000"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        android:padding="8dp" />
 </LinearLayout>
