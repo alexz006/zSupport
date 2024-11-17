@@ -223,15 +223,4 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Кнопка REBOOT -->
-    <Button
-        android:id="@+id/rebootButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="REBOOT"
-        android:textColor="@android:color/white"
-        android:background="#8B0000"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="@dimen/mainLayoutPadding"
-        android:padding="@dimen/mainLayoutPadding" />
 </FrameLayout>

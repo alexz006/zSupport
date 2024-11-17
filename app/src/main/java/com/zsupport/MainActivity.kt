@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         val timezoneButton = findViewById<Button>(R.id.timezoneButton)
         val autoDetectCheckbox = findViewById<CheckBox>(R.id.autoDetectTimezoneCheckbox)
         val radioGroupTimezone = findViewById<RadioGroup>(R.id.radioGroupTimezone)
-        val rebootButton = findViewById<Button>(R.id.rebootButton)
 
         val appSelector = findViewById<AutoCompleteTextView>(R.id.appSelector)
         val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
@@ -51,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         clearCacheButton.isEnabled = false
         clearDataButton.isEnabled = false
         forceStopButton.isEnabled = false
-        rebootButton.isEnabled = false
 
         // Настраиваем действие для чекбокса
         agreementCheckBox.setOnCheckedChangeListener { _, isChecked ->
@@ -62,7 +60,6 @@ class MainActivity : AppCompatActivity() {
             updateButtonState(clearCacheButton, isChecked)
             updateButtonState(clearDataButton, isChecked)
             updateButtonState(forceStopButton, isChecked)
-            updateButtonState(rebootButton, isChecked)
         }
 
         // Настраиваем действия для кнопок
@@ -160,11 +157,6 @@ class MainActivity : AppCompatActivity() {
             hideKeyboard()
             false
         }
-
-        rebootButton.setOnClickListener {
-            SystemHelper.showRebootDialog(this)
-        }
-
 
         //////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////
