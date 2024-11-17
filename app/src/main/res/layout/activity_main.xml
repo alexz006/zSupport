@@ -173,6 +173,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Select App"
+                android:padding="@dimen/selectTimeZonePadding"
                 android:layout_marginBottom="@dimen/mainLayoutMargin">
 
                 <AutoCompleteTextView
@@ -180,6 +181,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/boxAgreementTextSize"
+                    android:padding="@dimen/selectTimeZonePadding"
                     android:background="@drawable/custom_spinner_background" />
             </com.google.android.material.textfield.TextInputLayout>
 
