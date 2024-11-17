@@ -153,6 +153,62 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Новый блок для управления приложениями -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="@dimen/mainLayoutMargin">
+
+        <!-- Spinner для выбора приложения -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Select App"
+            android:layout_marginBottom="@dimen/mainLayoutMargin">
+
+            <AutoCompleteTextView
+                android:id="@+id/appSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/boxAgreementTextSize"
+                android:background="@drawable/custom_spinner_background" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Кнопки для управления приложениями -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/mainLayoutMargin">
+
+            <Button
+                android:id="@+id/clearCacheButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clear Cache"
+                android:layout_marginEnd="8dp"
+                android:textSize="@dimen/boxAgreementTextSize" />
+
+            <Button
+                android:id="@+id/clearDataButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clear Data"
+                android:layout_marginEnd="8dp"
+                android:textSize="@dimen/boxAgreementTextSize" />
+
+            <Button
+                android:id="@+id/forceStopButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Force Stop"
+                android:textSize="@dimen/boxAgreementTextSize" />
+        </LinearLayout>
+    </LinearLayout>
+
     <!-- Кнопка REBOOT -->
     <Button
         android:id="@+id/rebootButton"

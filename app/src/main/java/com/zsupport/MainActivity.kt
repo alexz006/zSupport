@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.zsupport.helpers.AppHelper
 import com.zsupport.helpers.HoverUtils
 import com.zsupport.helpers.SystemHelper
 import java.util.Locale
@@ -32,6 +33,11 @@ class MainActivity : AppCompatActivity() {
         val autoDetectCheckbox = findViewById<CheckBox>(R.id.autoDetectTimezoneCheckbox)
         val radioGroupTimezone = findViewById<RadioGroup>(R.id.radioGroupTimezone)
         val rebootButton = findViewById<Button>(R.id.rebootButton)
+
+        val appSelector = findViewById<AutoCompleteTextView>(R.id.appSelector)
+        val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
+        val clearDataButton = findViewById<Button>(R.id.clearDataButton)
+        val forceStopButton = findViewById<Button>(R.id.forceStopButton)
 
 
         HoverUtils().setHover(chineseButton, englishButton, timezoneButton)
@@ -143,6 +149,62 @@ class MainActivity : AppCompatActivity() {
 
         rebootButton.setOnClickListener {
             SystemHelper.showRebootDialog(this)
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        /////////////////// Apps processing /////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+
+        // Получение списка приложений
+        val appPackages = AppHelper.getInstalledApps(this) // Список приложений
+        val appNames = appPackages.map { it.second } // Имена приложений
+
+        // Настройка адаптера для Spinner
+        val appAdapter = ArrayAdapter(this, R.layout.custom_spinner_item, appNames)
+        appSelector.setAdapter(appAdapter)
+        appSelector.threshold = 1
+
+        // Обработка нажатий кнопок
+        clearCacheButton.setOnClickListener {
+            val selectedAppName = appSelector.text.toString()
+            val selectedPackage = appPackages.find { it.second == selectedAppName }?.first
+
+            if (selectedPackage != null) {
+                AppHelper.clearAppCache(this, selectedPackage)
+                Toast.makeText(this, "Cache cleared for $selectedAppName", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.e("MainActivity", "App not found: $selectedAppName")
+                Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        clearDataButton.setOnClickListener {
+            val selectedAppName = appSelector.text.toString()
+            val selectedPackage = appPackages.find { it.second == selectedAppName }?.first
+
+            if (selectedPackage != null) {
+                AppHelper.clearAppData(this, selectedPackage)
+                Toast.makeText(this, "Data cleared for $selectedAppName", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.e("MainActivity", "App not found: $selectedAppName")
+                Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        forceStopButton.setOnClickListener {
+            val selectedAppName = appSelector.text.toString()
+            val selectedPackage = appPackages.find { it.second == selectedAppName }?.first
+
+            if (selectedPackage != null) {
+                AppHelper.forceStopApp(this, selectedPackage)
+                Toast.makeText(this, "App stopped: $selectedAppName", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.e("MainActivity", "App not found: $selectedAppName")
+                Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
+            }
         }
 
 
