@@ -13,6 +13,7 @@ import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.zsupport.helpers.HoverUtils
+import com.zsupport.helpers.SystemHelper
 import java.util.Locale
 import java.util.TimeZone
 
@@ -135,18 +136,13 @@ class MainActivity : AppCompatActivity() {
             setAutoTimeZoneEnabled(!isChecked)
         }
 
-        findViewById<LinearLayout>(R.id.rootLayout).setOnTouchListener { _, _ ->
+        findViewById<FrameLayout>(R.id.rootLayout).setOnTouchListener { _, _ ->
             hideKeyboard()
             false
         }
 
         rebootButton.setOnClickListener {
-            try {
-                val pm = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
-                pm.reboot(null)
-            } catch (e: Exception) {
-                Log.e("MainActivity", "Failed to reboot: ${e.message}", e)
-            }
+            SystemHelper.showRebootDialog(this)
         }
 
 

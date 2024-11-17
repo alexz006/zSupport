@@ -1,149 +1,155 @@
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/mainLayoutPadding"
-    android:gravity="center_horizontal"
     android:background="?attr/mainBackground">
 
-    <!-- Основной текст -->
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="@dimen/boxAgreementTextWidth"
-        android:layout_height="wrap_content"
-        android:text="@string/boxAgreement"
-        android:textSize="@dimen/boxAgreementTextSize"
-        android:layout_marginBottom="@dimen/mainLayoutTopMargin"
-        android:layout_gravity="center_horizontal"
-        android:textColor="?attr/mainText"
-        android:justificationMode="inter_word" />
-
-    <!-- Чекбокс с текстом "Я согласен" слева от него -->
+    <!-- Основной контент, сохраняем существующее форматирование -->
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/mainLayoutPadding"
+        android:gravity="center_horizontal">
 
-        <CheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            android:layout_marginEnd="16dp" />
-
+        <!-- Основной текст -->
         <TextView
-            android:id="@+id/agreementText"
-            android:layout_width="wrap_content"
+            android:id="@+id/textView"
+            android:layout_width="@dimen/boxAgreementTextWidth"
             android:layout_height="wrap_content"
-            android:text="@string/imAgreedText"
+            android:text="@string/boxAgreement"
             android:textSize="@dimen/boxAgreementTextSize"
+            android:layout_marginBottom="@dimen/mainLayoutTopMargin"
+            android:layout_gravity="center_horizontal"
             android:textColor="?attr/mainText"
             android:justificationMode="inter_word" />
-    </LinearLayout>
 
-    <!-- Разделение экрана на две половины -->
-    <LinearLayout
-        android:layout_width="@dimen/boxAgreementTextWidth"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="@dimen/mainLayoutTopMargin">
-
-        <!-- Левая половина с кнопками переключения языка -->
+        <!-- Чекбокс с текстом "Я согласен" слева от него -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
-
-            <Button
-                android:id="@+id/chineseButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CHINESE"
-                android:textSize="@dimen/boxAgreementTextSize"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/englishButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ENGLISH"
-                android:textSize="@dimen/boxAgreementTextSize" />
-        </LinearLayout>
-
-        <!-- Правая половина с Spinner и кнопкой изменения времени -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Select Timezone"
-                android:padding="@dimen/selectTimeZonePadding"
-                android:layout_marginTop="@dimen/mainLayoutTopMargin">
-
-                <AutoCompleteTextView
-                    android:id="@+id/timezoneAutoComplete"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/boxAgreementTextSize"
-                    android:padding="@dimen/selectTimeZonePadding"
-                    android:background="@drawable/custom_spinner_background" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <RadioGroup
-                android:id="@+id/radioGroupTimezone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="@dimen/mainLayoutMargin"
-                android:layout_marginBottom="8dp">
-
-                <RadioButton
-                    android:id="@+id/radioTemporary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Temporary Change"
-                    android:textSize="@dimen/boxAgreementTextSize"
-                    android:checked="true" />
-
-                <RadioButton
-                    android:id="@+id/radioPermanent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Permanent Change"
-                    android:layout_marginTop="@dimen/mainLayoutMargin"
-                    android:textSize="@dimen/boxAgreementTextSize" />
-            </RadioGroup>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp">
 
             <CheckBox
-                android:id="@+id/autoDetectTimezoneCheckbox"
+                android:id="@+id/checkBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Disable Auto Timezone"
-                android:layout_marginTop="@dimen/mainLayoutMargin"
-                android:textSize="@dimen/boxAgreementTextSize"
-                android:layout_marginBottom="8dp" />
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                android:layout_marginEnd="16dp" />
 
-            <Button
-                android:id="@+id/timezoneButton"
+            <TextView
+                android:id="@+id/agreementText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Set Timezone"
-                android:layout_marginTop="@dimen/mainLayoutMargin"
-                android:textSize="@dimen/boxAgreementTextSize" />
+                android:text="@string/imAgreedText"
+                android:textSize="@dimen/boxAgreementTextSize"
+                android:textColor="?attr/mainText"
+                android:justificationMode="inter_word" />
+        </LinearLayout>
+
+        <!-- Разделение экрана на две половины -->
+        <LinearLayout
+            android:layout_width="@dimen/boxAgreementTextWidth"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/mainLayoutTopMargin">
+
+            <!-- Левая половина с кнопками переключения языка -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/chineseButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CHINESE"
+                    android:textSize="@dimen/boxAgreementTextSize"
+                    android:layout_marginBottom="8dp" />
+
+                <Button
+                    android:id="@+id/englishButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ENGLISH"
+                    android:textSize="@dimen/boxAgreementTextSize" />
+            </LinearLayout>
+
+            <!-- Правая половина с Spinner и кнопкой изменения времени -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Select Timezone"
+                    android:padding="@dimen/selectTimeZonePadding"
+                    android:layout_marginTop="@dimen/mainLayoutTopMargin">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/timezoneAutoComplete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/boxAgreementTextSize"
+                        android:padding="@dimen/selectTimeZonePadding"
+                        android:background="@drawable/custom_spinner_background" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <RadioGroup
+                    android:id="@+id/radioGroupTimezone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="@dimen/mainLayoutMargin"
+                    android:layout_marginBottom="8dp">
+
+                    <RadioButton
+                        android:id="@+id/radioTemporary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Temporary Change"
+                        android:textSize="@dimen/boxAgreementTextSize"
+                        android:checked="true" />
+
+                    <RadioButton
+                        android:id="@+id/radioPermanent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Permanent Change"
+                        android:layout_marginTop="@dimen/mainLayoutMargin"
+                        android:textSize="@dimen/boxAgreementTextSize" />
+                </RadioGroup>
+
+                <CheckBox
+                    android:id="@+id/autoDetectTimezoneCheckbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Disable Auto Timezone"
+                    android:layout_marginTop="@dimen/mainLayoutMargin"
+                    android:textSize="@dimen/boxAgreementTextSize"
+                    android:layout_marginBottom="8dp" />
+
+                <Button
+                    android:id="@+id/timezoneButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set Timezone"
+                    android:layout_marginTop="@dimen/mainLayoutMargin"
+                    android:textSize="@dimen/boxAgreementTextSize" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
@@ -158,4 +164,4 @@
         android:layout_gravity="bottom|start"
         android:layout_margin="16dp"
         android:padding="8dp" />
-</LinearLayout>
+</FrameLayout>
