@@ -8,13 +8,12 @@ class PermissionsHelper {
     val TAG = "AnyAppPermissionsHelper"
 
     private val packagePermissionsMap = mutableMapOf(
-        "com.anyapp.store" to listOf("REQUEST_INSTALL_PACKAGES"),
-        "com.anyapp.zee.store" to listOf("REQUEST_INSTALL_PACKAGES"),
-        "ru.vk.store" to listOf("REQUEST_INSTALL_PACKAGES"),
+        "com.anyapp.store" to listOf("android.permission.REQUEST_INSTALL_PACKAGES"),
+        "com.anyapp.zee.store" to listOf("android.permission.REQUEST_INSTALL_PACKAGES"),
+        "ru.vk.store" to listOf("android.permission.REQUEST_INSTALL_PACKAGES"),
         "air.StrelkaHUDFREE" to listOf("android.permission.SYSTEM_ALERT_WINDOW", "deviceidle whitelist")
     )
 
-    // Метод для выдачи прав согласно маппингу
     fun applyPermissions(context: Context, packageName: String) {
         val permissions = packagePermissionsMap[packageName]
         if (permissions.isNullOrEmpty()) {
@@ -23,20 +22,25 @@ class PermissionsHelper {
         }
 
         permissions.forEach { permission ->
-            when (permission) {
-                "REQUEST_INSTALL_PACKAGES" -> {
-                    grantRuntimePermission(context, packageName, permission)
+            try {
+                when (permission) {
+                    "android.permission.REQUEST_INSTALL_PACKAGES" -> {
+                        setAppOpsPermission(context, packageName, "OP_REQUEST_INSTALL_PACKAGES", "allow")
+                    }
+                    "android.permission.SYSTEM_ALERT_WINDOW" -> {
+                        grantRuntimePermission(context, packageName, permission)
+                    }
+                    "deviceidle whitelist" -> {
+                        addToWhitelist(packageName)
+                    }
+                    else -> Log.e(TAG, "Unknown permission/action: $permission for $packageName")
                 }
-                "android.permission.SYSTEM_ALERT_WINDOW" -> {
-                    grantRuntimePermission(context, packageName, permission)
-                }
-                "deviceidle whitelist" -> {
-                    addToWhitelist(packageName)
-                }
-                else -> Log.e(TAG, "Unknown permission/action: $permission for $packageName")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to process permission $permission for $packageName: ${e.message}", e)
             }
         }
     }
+
 
     private fun grantRuntimePermission(context: Context, packageName: String, permission: String) {
         try {
@@ -59,7 +63,6 @@ class PermissionsHelper {
             Log.e(TAG, "Failed to grant permission $permission to $packageName: ${e.message}", e)
         }
     }
-
 
     // Добавить в whitelist Doze Mode
     private fun addToWhitelist(packageName: String) {
@@ -85,4 +88,32 @@ class PermissionsHelper {
         packagePermissionsMap[packageName] = permissions
         Log.i(TAG, "Added $packageName with permissions: $permissions")
     }
+
+    private fun setAppOpsPermission(context: Context, packageName: String, appOp: String, mode: String) {
+        try {
+            val appOpsManagerClass = Class.forName("android.app.AppOpsManager")
+            val setModeMethod = appOpsManagerClass.getMethod(
+                "setMode",
+                Integer.TYPE,  // опция
+                Integer.TYPE,  // UID приложения
+                String::class.java, // пакет
+                Integer.TYPE   // режим (0=allow, 1=ignore)
+            )
+
+            val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE)
+            val appUid = context.packageManager.getApplicationInfo(packageName, 0).uid
+            val modeValue = when (mode.lowercase()) {
+                "allow" -> 0  // MODE_ALLOWED
+                "ignore" -> 1  // MODE_IGNORED
+                else -> throw IllegalArgumentException("Unsupported mode: $mode")
+            }
+
+            val opCode = appOpsManagerClass.getDeclaredField(appOp).getInt(null)
+            setModeMethod.invoke(appOpsManager, opCode, appUid, packageName, modeValue)
+            Log.i(TAG, "AppOps $appOp set to $mode for $packageName")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to set AppOps $appOp for $packageName: ${e.message}", e)
+        }
+    }
+
 }

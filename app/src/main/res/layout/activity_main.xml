@@ -223,4 +223,15 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Текст для отображения статуса приложений -->
+    <TextView
+        android:id="@+id/statusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        android:textColor="?attr/mainText"
+        android:textSize="14sp"
+        android:text=""/>
+
 </FrameLayout>

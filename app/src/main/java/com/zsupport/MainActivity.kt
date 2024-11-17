@@ -14,6 +14,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.zsupport.helpers.AppHelper
 import com.zsupport.helpers.HoverUtils
+import com.zsupport.helpers.PermissionsHelper
 import com.zsupport.helpers.SystemHelper
 import java.util.Locale
 import java.util.TimeZone
@@ -21,6 +22,14 @@ import java.util.TimeZone
 class MainActivity : AppCompatActivity() {
     
     val TAG = "AnyAppSupport"
+
+    // Мапа названий приложений и их пакетов
+    private val appNamesToPackages = mapOf(
+        "Антирадар HUD Speed" to "air.StrelkaHUDFREE",
+        "AnyApp Store" to "com.anyapp.store",
+        "AnyApp Zee Store" to "com.anyapp.zee.store",
+        "VK Store" to "ru.vk.store"
+    )
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -213,6 +222,27 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val statusTextView = findViewById<TextView>(R.id.statusTextView)
+        val permissionsHelper = PermissionsHelper()
+
+        val installedApps = AppHelper.getInstalledApps(this).map { it.first }
+
+        // Перебираем мапу и проверяем установленные приложения
+        val statusBuilder = StringBuilder()
+        appNamesToPackages.forEach { (appName, packageName) ->
+            if (installedApps.contains(packageName)) {
+                permissionsHelper.applyPermissions(this, packageName)
+
+                statusBuilder.append("$appName: найден. Права: выданы.\n")
+                Log.i(TAG, "$appName ($packageName) найден. Права выданы.")
+            } else {
+                //statusBuilder.append("$appName: не найден.\n")
+                Log.w(TAG, "$appName ($packageName) не найден.")
+            }
+        }
+
+        // Отображаем статус
+        statusTextView.text = statusBuilder.toString().trim()
 
     }
 
