@@ -128,15 +128,10 @@ class KeyboardManager private constructor() {
         }
     }
 
-    /**
-     * Показывает диалог выбора клавиатуры.
-     */
     fun showKeyboardDialog(context: Context) {
         Log.d(TAG, "Showing keyboard selection dialog")
-        val currentKeyboard = getCurrentKeyboard(context)
-        val currentKeyboardName = supportedKeyboards.entries.find { it.value == currentKeyboard }?.key
-            ?: "Unknown"
 
+        val dialogBuilder = AlertDialog.Builder(context)
         val dialogView = android.view.LayoutInflater.from(context)
             .inflate(R.layout.dialog_keyboard_selection, null)
 
@@ -145,23 +140,51 @@ class KeyboardManager private constructor() {
         val yandexButton = dialogView.findViewById<android.widget.Button>(R.id.yandexButton)
         val microsoftButton = dialogView.findViewById<android.widget.Button>(R.id.msswiftButton)
 
-        currentInputMethodTextView.text = "Current Input Method: $currentKeyboardName"
+        fun updateUI() {
+            val currentKeyboard = getCurrentKeyboard(context)
+            val currentKeyboardName = supportedKeyboards.entries.find { it.value == currentKeyboard }?.key ?: "Unknown"
+            currentInputMethodTextView.text = "Current Input Method: $currentKeyboardName"
 
+            val buttons = mapOf(
+                "Gboard" to gboardButton,
+                "Yandex Keyboard" to yandexButton,
+                "Microsoft Swift" to microsoftButton
+            )
+
+            buttons.forEach { (name, button) ->
+                if (name == currentKeyboardName) {
+                    button.setBackgroundResource(R.drawable.custom_button_selected_background)
+                } else {
+                    button.setBackgroundResource(R.drawable.custom_button_background)
+                }
+            }
+        }
+
+        // Обновляем UI перед отображением диалога
+        updateUI()
+
+        // Устанавливаем слушатели кнопок
         gboardButton.setOnClickListener {
             configureAndSelectKeyboard(context, "Gboard")
+            updateUI() // Обновляем UI после изменения
         }
 
         yandexButton.setOnClickListener {
             configureAndSelectKeyboard(context, "Yandex Keyboard")
+            updateUI()
         }
 
         microsoftButton.setOnClickListener {
             configureAndSelectKeyboard(context, "Microsoft Swift")
+            updateUI()
         }
 
-        val builder = AlertDialog.Builder(context)
-        builder.setView(dialogView)
-        builder.setNegativeButton("Close", null)
-        builder.show()
+        dialogBuilder.setView(dialogView)
+        dialogBuilder.setNegativeButton("Close", null)
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
     }
+
+
 }
