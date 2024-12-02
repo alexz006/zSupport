@@ -12,4 +12,6 @@
     <dimen name="buttonsMainWidth">150dp</dimen>
     <dimen name="buttonsMainHight">75dp</dimen>
     <dimen name="mainSmallMargin">6dp</dimen>
+    <dimen name="keyBoardHeaderTextSize">24sp</dimen>
+    <dimen name="keyBoardHeaderMarginBottom">12dp</dimen>
 </resources>

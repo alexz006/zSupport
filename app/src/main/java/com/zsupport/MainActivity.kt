@@ -14,6 +14,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.zsupport.helpers.AppHelper
 import com.zsupport.helpers.HoverUtils
+import com.zsupport.helpers.KeyboardManager
 import com.zsupport.helpers.PermissionsHelper
 import com.zsupport.helpers.SystemHelper
 import java.util.Locale
@@ -221,6 +222,10 @@ class MainActivity : AppCompatActivity() {
                 Log.e(TAG, "App not found: $selectedAppName")
                 Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        keyboardSelectButton.setOnClickListener {
+            KeyboardManager.getInstance().showKeyboardDialog(this)
         }
 
     }
