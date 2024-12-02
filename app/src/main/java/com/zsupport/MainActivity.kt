@@ -48,9 +48,10 @@ class MainActivity : AppCompatActivity() {
         val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
         val clearDataButton = findViewById<Button>(R.id.clearDataButton)
         val forceStopButton = findViewById<Button>(R.id.forceStopButton)
+        val keyboardSelectButton = findViewById<ImageButton>(R.id.keyboardButton)
 
 
-        HoverUtils().setHover(chineseButton, englishButton, timezoneButton)
+        HoverUtils().setHover(chineseButton, englishButton, timezoneButton, clearCacheButton, clearDataButton, forceStopButton, keyboardSelectButton)
 
         // Начально деактивируем кнопки
         chineseButton.isEnabled = false

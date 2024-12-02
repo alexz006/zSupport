@@ -2,4 +2,5 @@
     <string name="app_name">zSupport</string>
     <string name="boxAgreement">By managing system settings from this application, you confirm that you are fully aware of your actions and the potential consequences they may lead to. Any changes made directly to the system parameters of the vehicle may result in malfunctions, lockouts, or the complete inoperability of certain software or the vehicle itself, lack of updates, data desynchronization, and more. By clicking any buttons in this application, you acknowledge that you fully understand the above and accept full responsibility for your actions and their potential consequences.</string>
     <string name="imAgreedText">I Agree</string>
+    <string name="keyboard_icon">Keyboard selection dialog</string>
 </resources>
