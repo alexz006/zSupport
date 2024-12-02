@@ -1,6 +1,8 @@
 package com.zsupport.helpers
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -183,6 +185,7 @@ class KeyboardManager private constructor() {
         dialogBuilder.setNegativeButton("Close", null)
 
         val dialog = dialogBuilder.create()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
     }
 
