@@ -121,9 +121,9 @@ class KeyboardManager private constructor() {
             if (isKeyboardInstalled(context, inputMethod)) {
                 enableKeyboard(context, inputMethod)
                 selectKeyboard(context, inputMethod)
-                Toast.makeText(context, "$keyboardName activated", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(context, "$keyboardName activated")
             } else {
-                Toast.makeText(context, "$keyboardName not installed", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(context, "$keyboardName not installed")
             }
         } else {
             Log.e(TAG, "Unsupported keyboard: $keyboardName")

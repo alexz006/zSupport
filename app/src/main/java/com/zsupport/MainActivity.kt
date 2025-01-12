@@ -26,6 +26,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.zsupport.helpers.UIHelper
+
 
 class MainActivity : AppCompatActivity() {
     
@@ -169,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 Log.e(TAG, "Selected timezone not found in available IDs.")
-                Toast.makeText(this, "Invalid timezone selected", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(applicationContext, "Invalid timezone selected")
             }
         }
 
@@ -204,10 +206,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.clearAppCache(this, selectedPackage)
-                Toast.makeText(this, "Cache cleared for $selectedAppName", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(applicationContext, "Cache cleared for $selectedAppName")
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(applicationContext, "Please select a valid app")
             }
         }
 
@@ -217,10 +219,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.clearAppData(this, selectedPackage)
-                Toast.makeText(this, "Data cleared for $selectedAppName", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(applicationContext, "Data cleared for $selectedAppName")
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(applicationContext, "Please select a valid app")
             }
         }
 
@@ -230,10 +232,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.forceStopApp(this, selectedPackage)
-                Toast.makeText(this, "App stopped: $selectedAppName", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(applicationContext, "App stopped: $selectedAppName")
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                Toast.makeText(this, "Please select a valid app", Toast.LENGTH_SHORT).show()
+                UIHelper.showCustomToast(applicationContext, "Please select a valid app")
             }
         }
 
@@ -274,7 +276,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e(TAG, "Error reading USB mode", e)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@MainActivity, "Failed to read USB mode", Toast.LENGTH_SHORT).show()
+                    UIHelper.showCustomToast(applicationContext, "Failed to read USB mode")
 
                     if (currentUSBPosition != 0) {
                         isProgrammaticChange = true
@@ -301,15 +303,17 @@ class MainActivity : AppCompatActivity() {
                 val newMode = if (position == 0) "0" else "1"
 
                 CoroutineScope(Dispatchers.IO).launch {
-                    val isSuccess = usbHelper.setUSBMode(newMode)
+                    var isSuccess = usbHelper.setUSBMode(newMode)
+
+                    //isSuccess = true // Remove this line after implementing the actual functionality
 
                     withContext(Dispatchers.Main) {
                         if (isSuccess) {
                             currentUSBPosition = position
-                            Toast.makeText(this@MainActivity, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}", Toast.LENGTH_SHORT).show()
+                            UIHelper.showCustomToast(applicationContext, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}")
                             Log.i(TAG, "USB Mode successfully set to $newMode")
                         } else {
-                            Toast.makeText(this@MainActivity, "Failed to set USB Mode", Toast.LENGTH_SHORT).show()
+                            UIHelper.showCustomToast(applicationContext, "Failed to set USB Mode")
                             Log.e(TAG, "Failed to set USB Mode to $newMode")
 
                             isProgrammaticChange = true
