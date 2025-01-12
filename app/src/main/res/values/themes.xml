@@ -57,10 +57,10 @@
     <color name="blue_500">#3B99FF</color>
 
     <!-- Colors for ButtonBar -->
-    <color name="buttonBarBGColor">?attr/mainBackground</color>
-    <color name="buttonBarTextColor">?attr/mainText</color>
-    <color name="buttonBarBorderColor">?attr/mainText</color>
-    <color name="buttonBarRippleColor">?attr/mainText</color>
+    <color name="buttonBarBGColor">@color/mainBackground</color>
+    <color name="buttonBarTextColor">@color/mainText</color>
+    <color name="buttonBarBorderColor">@color/mainText</color>
+    <color name="buttonBarRippleColor">@color/mainText</color>
     <color name="buttonBarSelectedColor">@color/blue_500</color>
 
 </resources>
