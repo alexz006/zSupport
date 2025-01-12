@@ -55,4 +55,12 @@
     <color name="colorPrimaryDark">#707070</color> <!-- Белый текст -->
     <color name="grey_300">#888888</color>
     <color name="blue_500">#3B99FF</color>
+
+    <!-- Colors for ButtonBar -->
+    <color name="buttonBarBGColor">?attr/mainBackground</color>
+    <color name="buttonBarTextColor">?attr/mainText</color>
+    <color name="buttonBarBorderColor">?attr/mainText</color>
+    <color name="buttonBarRippleColor">?attr/mainText</color>
+    <color name="buttonBarSelectedColor">@color/blue_500</color>
+
 </resources>

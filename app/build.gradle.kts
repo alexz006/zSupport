@@ -13,8 +13,8 @@ android {
         applicationId = "com.zsupport"
         minSdk = 21
         targetSdk = 32
-        versionCode = 120
-        versionName = "1.2.0"
+        versionCode = 130
+        versionName = "1.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
