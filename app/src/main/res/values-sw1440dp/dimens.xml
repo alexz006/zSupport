@@ -14,5 +14,5 @@
     <dimen name="mainSmallMargin">8dp</dimen>
     <dimen name="keyBoardHeaderTextSize">32sp</dimen>
     <dimen name="keyBoardHeaderMarginBottom">16dp</dimen>
-    <dimen name="usbSwitcherWidth">600dp</dimen>
+    <dimen name="usbSwitcherWidth">500dp</dimen>
 </resources>

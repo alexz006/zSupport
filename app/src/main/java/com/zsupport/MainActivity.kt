@@ -257,8 +257,10 @@ class MainActivity : AppCompatActivity() {
                 val currentUSBMode = usbHelper.getUSBMode()
                 Log.i(TAG, "Current USB mode: ${usbHelper.formatUsbMode(currentUSBMode)}")
 
+                val isAutoUSBperipheral = prefs.getBoolean("auto_usb_peripheral", false)
+
                 withContext(Dispatchers.Main) {
-                    val initialPosition = when (currentUSBMode) {
+                    var initialPosition = when (currentUSBMode) {
                         "0" -> 0
                         "1" -> 1
                         else -> {
@@ -266,6 +268,12 @@ class MainActivity : AppCompatActivity() {
                             0
                         }
                     }
+
+                    if (isAutoUSBperipheral) {
+                        Log.d(TAG, "Auto USB peripheral mode enabled")
+                        initialPosition = 2
+                    }
+
 
                     // Установка позиции только если она отличается от текущей
                     if (currentUSBPosition != initialPosition) {
@@ -304,12 +312,6 @@ class MainActivity : AppCompatActivity() {
 
                 val newMode = if (position == 0 || position == 2) "0" else "1"
 
-                if (position == 2) {
-                    prefs.edit().putBoolean("auto_usb_peripheral", true).apply()
-                } else {
-                    prefs.edit().putBoolean("auto_usb_peripheral", false).apply()
-                }
-
                 CoroutineScope(Dispatchers.IO).launch {
                     var isSuccess = usbHelper.setUSBMode(newMode)
 
@@ -317,6 +319,13 @@ class MainActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
                         if (isSuccess) {
+
+                            if (position == 2) {
+                                prefs.edit().putBoolean("auto_usb_peripheral", true).apply()
+                            } else {
+                                prefs.edit().putBoolean("auto_usb_peripheral", false).apply()
+                            }
+
                             currentUSBPosition = position
                             UIHelper.showCustomToast(this@MainActivity, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}")
                             Log.i(TAG, "USB Mode successfully set to $newMode")
@@ -486,6 +495,8 @@ class MainActivity : AppCompatActivity() {
                 val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                 val selectedTimeZone = prefs.getString("selected_time_zone", null)
                 val isAutoUSBperitheral = prefs.getBoolean("auto_usb_peripheral", false)
+
+                Log.d(TAG, "Auto USB peripheral mode: $isAutoUSBperitheral")
 
                 if (isAutoUSBperitheral) {
                     try {
