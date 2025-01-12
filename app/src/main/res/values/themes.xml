@@ -1,15 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Определение атрибутов цветов -->
     <attr name="mainBackground" format="reference|color" />
     <attr name="mainText" format="reference|color" />
     <attr name="disabledText" format="reference|color" />
 
-    <!-- Общая тема для DayNight -->
     <style name="Theme.zSupport" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:fontFamily">@font/font_family</item>
 
-        <!-- Используйте атрибуты вместо конкретных цветов -->
         <item name="mainBackground">@color/mainBackground</item>
         <item name="mainText">@color/mainText</item>
         <item name="disabledText">@color/disabledText</item>

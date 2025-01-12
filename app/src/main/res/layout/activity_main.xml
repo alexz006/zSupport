@@ -90,6 +90,74 @@
                         android:layout_height="wrap_content"
                         android:text="ENGLISH"
                         style="@style/CustomOFFButtonStyle" />
+
+                    <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
+                        android:id="@+id/buttonGroup_vectorDrawable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginBottom="6dp"
+                        android:weightSum="3"
+                        app:draggable="true"
+                        app:selectedBackground="@color/indigo_800"
+                        app:borderWidth="1dp"
+                        app:borderColor="@color/indigo_800"
+                        app:radius="12dp"
+                        app:ripple="true"
+                        app:rippleColor="@color/indigo_800"
+                        >
+
+                        <com.addisonelliott.segmentedbutton.SegmentedButton
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="10dp"
+                            app:textColor="@color/indigo_800"
+                            app:selectedTextColor="@color/white"
+                            app:text="Bar"
+                            app:textSize="18sp"
+                            app:drawable="@drawable/ic_chart_bar"
+                            app:drawableTint="@color/indigo_800"
+                            app:selectedDrawableTint="@color/white"
+                            app:drawableGravity="top"
+                            app:drawablePadding="4dp"
+                            />
+
+                        <com.addisonelliott.segmentedbutton.SegmentedButton
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="10dp"
+                            app:textColor="@color/indigo_800"
+                            app:selectedTextColor="@color/white"
+                            app:text="Pie"
+                            app:textSize="18sp"
+                            app:drawable="@drawable/ic_chart_pie"
+                            app:drawableTint="@color/indigo_800"
+                            app:selectedDrawableTint="@color/white"
+                            app:drawableGravity="top"
+                            app:drawablePadding="4dp"
+                            />
+
+                        <com.addisonelliott.segmentedbutton.SegmentedButton
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="10dp"
+                            app:textColor="@color/indigo_800"
+                            app:selectedTextColor="@color/white"
+                            app:text="Donut"
+                            app:textSize="18sp"
+                            app:drawable="@drawable/ic_chart_donut"
+                            app:drawableTint="@color/indigo_800"
+                            app:selectedDrawableTint="@color/white"
+                            app:drawableGravity="top"
+                            app:drawablePadding="4dp"
+                            />
+
+                    </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
                 </LinearLayout>
 
                 <!-- Правая половина с Spinner и кнопкой изменения времени -->
