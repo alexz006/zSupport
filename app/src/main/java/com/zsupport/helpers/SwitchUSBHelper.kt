@@ -6,7 +6,7 @@ import java.io.InputStreamReader
 
 class SwitchUSBHelper {
 
-    private val TAG = "SwitchUSBHelper"
+    private val TAG = "AnyAppSwitchUSBHelper"
 
     fun getUSBMode(): String {
         return getPropValue("persist.usb.mode")
@@ -40,4 +40,13 @@ class SwitchUSBHelper {
             false
         }
     }
+
+    fun formatUsbMode(mode: String): String {
+        return when (mode) {
+            "1" -> "host"
+            "0" -> "peripheral"
+            else -> "unknown"
+        }
+    }
+
 }

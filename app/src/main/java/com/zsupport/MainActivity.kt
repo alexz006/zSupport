@@ -20,6 +20,12 @@ import com.zsupport.helpers.SystemHelper
 import java.util.Locale
 import java.util.TimeZone
 import android.widget.ArrayAdapter
+import com.addisonelliott.segmentedbutton.SegmentedButtonGroup
+import com.zsupport.helpers.SwitchUSBHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     
@@ -32,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         "AnyApp Zee Store" to "com.anyapp.zee.store",
         "VK Store" to "ru.vk.store"
     )
+
+    private val usbHelper = SwitchUSBHelper()
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         val forceStopButton = findViewById<Button>(R.id.forceStopButton)
         val keyboardSelectButton = findViewById<ImageButton>(R.id.keyboardButton)
 
+        val usbModeSwitcher = findViewById<SegmentedButtonGroup>(R.id.usbModeSwitcher)
 
         HoverUtils().setHover(chineseButton, englishButton, timezoneButton, clearCacheButton, clearDataButton, forceStopButton, keyboardSelectButton)
 
@@ -229,6 +238,62 @@ class MainActivity : AppCompatActivity() {
             KeyboardManager.getInstance().showKeyboardDialog(this)
         }
 
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        /////////////////// USB processing /////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val currentUSBMode = usbHelper.getUSBMode()
+                Log.i(TAG, "Current USB mode: ${usbHelper.formatUsbMode(currentUSBMode)}")
+
+                withContext(Dispatchers.Main) {
+                    val initialPosition = when (currentUSBMode) {
+                        "0" -> 0 // Режим Peripheral
+                        "1" -> 1 // Режим Host
+                        else -> {
+                            Log.w(TAG, "Unknown USB mode: $currentUSBMode. Setting default to Peripheral.")
+                            0 // По умолчанию Peripheral
+                        }
+                    }
+
+                    // Устанавливаем начальное положение без вызова слушателя
+                    usbModeSwitcher.setPosition(initialPosition, false)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error reading USB mode", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "Failed to read USB mode", Toast.LENGTH_SHORT).show()
+
+                    // Устанавливаем положение по умолчанию (Peripheral) при ошибке
+                    usbModeSwitcher.setPosition(0, false)
+                }
+            }
+        }
+
+        usbModeSwitcher.onPositionChangedListener =
+            SegmentedButtonGroup.OnPositionChangedListener { position ->
+                val newMode = if (position == 0) "0" else "1"
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    val isSuccess = usbHelper.setUSBMode(newMode)
+
+                    withContext(Dispatchers.Main) {
+                        if (isSuccess) {
+                            Toast.makeText(this@MainActivity, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}", Toast.LENGTH_SHORT).show()
+                            Log.i(TAG, "USB Mode successfully set to $newMode")
+                        } else {
+                            Toast.makeText(this@MainActivity, "Failed to set USB Mode", Toast.LENGTH_SHORT).show()
+                            Log.e(TAG, "Failed to set USB Mode to $newMode")
+
+                            // Возвращаем переключатель в предыдущее положение
+                            usbModeSwitcher.setPosition(if (newMode == "0") 1 else 0, true)
+                        }
+                    }
+                }
+            }
     }
 
     override fun onResume() {
