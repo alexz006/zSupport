@@ -40,6 +40,9 @@ class MainActivity : AppCompatActivity() {
     )
 
     private val usbHelper = SwitchUSBHelper()
+    private var isProgrammaticChange = false
+    private var currentUSBPosition: Int = -1 // Текущая позиция (инициализация значением, которого не бывает)
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -244,6 +247,7 @@ class MainActivity : AppCompatActivity() {
         //////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////
 
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val currentUSBMode = usbHelper.getUSBMode()
@@ -251,30 +255,49 @@ class MainActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
                     val initialPosition = when (currentUSBMode) {
-                        "0" -> 0 // Режим Peripheral
-                        "1" -> 1 // Режим Host
+                        "0" -> 0
+                        "1" -> 1
                         else -> {
                             Log.w(TAG, "Unknown USB mode: $currentUSBMode. Setting default to Peripheral.")
-                            0 // По умолчанию Peripheral
+                            0
                         }
                     }
 
-                    // Устанавливаем начальное положение без вызова слушателя
-                    usbModeSwitcher.setPosition(initialPosition, false)
+                    // Установка позиции только если она отличается от текущей
+                    if (currentUSBPosition != initialPosition) {
+                        isProgrammaticChange = true
+                        usbModeSwitcher.setPosition(initialPosition, false)
+                        isProgrammaticChange = false
+                        currentUSBPosition = initialPosition
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error reading USB mode", e)
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@MainActivity, "Failed to read USB mode", Toast.LENGTH_SHORT).show()
 
-                    // Устанавливаем положение по умолчанию (Peripheral) при ошибке
-                    usbModeSwitcher.setPosition(0, false)
+                    if (currentUSBPosition != 0) {
+                        isProgrammaticChange = true
+                        usbModeSwitcher.setPosition(0, false)
+                        isProgrammaticChange = false
+                        currentUSBPosition = 0
+                    }
                 }
             }
         }
 
         usbModeSwitcher.onPositionChangedListener =
             SegmentedButtonGroup.OnPositionChangedListener { position ->
+                if (isProgrammaticChange) {
+                    Log.i(TAG, "Ignoring programmatic position change")
+                    return@OnPositionChangedListener // Игнорируем вызов
+                }
+
+                if (position == currentUSBPosition) {
+                    Log.i(TAG, "Position unchanged. No action needed.")
+                    return@OnPositionChangedListener // Если позиция не изменилась, ничего не делаем
+                }
+
                 val newMode = if (position == 0) "0" else "1"
 
                 CoroutineScope(Dispatchers.IO).launch {
@@ -282,14 +305,16 @@ class MainActivity : AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
                         if (isSuccess) {
+                            currentUSBPosition = position
                             Toast.makeText(this@MainActivity, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}", Toast.LENGTH_SHORT).show()
                             Log.i(TAG, "USB Mode successfully set to $newMode")
                         } else {
                             Toast.makeText(this@MainActivity, "Failed to set USB Mode", Toast.LENGTH_SHORT).show()
                             Log.e(TAG, "Failed to set USB Mode to $newMode")
 
-                            // Возвращаем переключатель в предыдущее положение
-                            usbModeSwitcher.setPosition(if (newMode == "0") 1 else 0, true)
+                            isProgrammaticChange = true
+                            usbModeSwitcher.setPosition(currentUSBPosition, true) // Возвращаем в исходную позицию
+                            isProgrammaticChange = false
                         }
                     }
                 }
