@@ -92,7 +92,7 @@
                         style="@style/CustomOFFButtonStyle" />
 
                     <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
-                        android:id="@+id/buttonGroup_vectorDrawable"
+                        android:id="@+id/usbModeSwitcher"
                         android:layout_width="400dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/mainLayoutPadding"
