@@ -67,6 +67,8 @@ class MainActivity : AppCompatActivity() {
 
         val usbModeSwitcher = findViewById<SegmentedButtonGroup>(R.id.usbModeSwitcher)
 
+        val prefs = applicationContext.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
         HoverUtils().setHover(chineseButton, englishButton, timezoneButton, clearCacheButton, clearDataButton, forceStopButton, keyboardSelectButton)
 
         // Начально деактивируем кнопки
@@ -300,7 +302,13 @@ class MainActivity : AppCompatActivity() {
                     return@OnPositionChangedListener // Если позиция не изменилась, ничего не делаем
                 }
 
-                val newMode = if (position == 0) "0" else "1"
+                val newMode = if (position == 0 || position == 2) "0" else "1"
+
+                if (position == 2) {
+                    prefs.edit().putBoolean("auto_usb_peripheral", true).apply()
+                } else {
+                    prefs.edit().putBoolean("auto_usb_peripheral", false).apply()
+                }
 
                 CoroutineScope(Dispatchers.IO).launch {
                     var isSuccess = usbHelper.setUSBMode(newMode)
@@ -471,9 +479,23 @@ class MainActivity : AppCompatActivity() {
         val TAG = "AnyAppSupport"
 
         override fun onReceive(context: Context, intent: Intent?) {
+
+            Log.d(TAG, "Context class: ${context.javaClass.name}")
+
             if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
                 val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                 val selectedTimeZone = prefs.getString("selected_time_zone", null)
+                val isAutoUSBperitheral = prefs.getBoolean("auto_usb_peripheral", false)
+
+                if (isAutoUSBperitheral) {
+                    try {
+                        val usbHelper = SwitchUSBHelper()
+                        usbHelper.setUSBMode("0")
+                        Log.d(TAG, "USB mode switched to peripheral on system boot.")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to switch USB mode on system boot: ${e.message}", e)
+                    }
+                }
 
                 if (!selectedTimeZone.isNullOrEmpty()) {
                     try {

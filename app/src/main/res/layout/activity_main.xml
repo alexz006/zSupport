@@ -93,10 +93,10 @@
 
                     <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
                         android:id="@+id/usbModeSwitcher"
-                        android:layout_width="400dp"
+                        android:layout_width="@dimen/usbSwitcherWidth"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/mainLayoutPadding"
-                        android:weightSum="2"
+                        android:weightSum="3"
                         app:draggable="true"
                         app:selectedBackground="@color/buttonBarSelectedColor"
                         app:borderWidth="1dp"
@@ -137,6 +137,23 @@
                             app:drawableGravity="top"
                             app:drawablePadding="4dp"
                             />
+
+                        <com.addisonelliott.segmentedbutton.SegmentedButton
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:padding="@dimen/buttonsMainPadding"
+                            app:textColor="@color/buttonBarTextColor"
+                            app:selectedTextColor="@color/white"
+                            app:text="AUTO"
+                            app:textSize="@dimen/boxAgreementTextSize"
+                            app:drawable="@drawable/baseline_autorenew_54"
+                            app:drawableTint="@color/buttonBarTextColor"
+                            app:selectedDrawableTint="@color/white"
+                            app:drawableGravity="top"
+                            app:drawablePadding="4dp"
+                            />
+
                     </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
                 </LinearLayout>
 
