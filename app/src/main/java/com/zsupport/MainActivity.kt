@@ -496,7 +496,7 @@ class MainActivity : AppCompatActivity() {
                 val selectedTimeZone = prefs.getString("selected_time_zone", null)
                 val isAutoUSBperitheral = prefs.getBoolean("auto_usb_peripheral", false)
 
-                Log.d(TAG, "Auto USB peripheral mode: $isAutoUSBperitheral")
+                Log.d(TAG, "Auto USB peripheral mode: $isAutoUSBperitheral.")
 
                 if (isAutoUSBperitheral) {
                     try {
