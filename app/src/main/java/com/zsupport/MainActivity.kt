@@ -171,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 Log.e(TAG, "Selected timezone not found in available IDs.")
-                UIHelper.showCustomToast(applicationContext, "Invalid timezone selected")
+                UIHelper.showCustomToast(this@MainActivity, "Invalid timezone selected")
             }
         }
 
@@ -206,10 +206,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.clearAppCache(this, selectedPackage)
-                UIHelper.showCustomToast(applicationContext, "Cache cleared for $selectedAppName")
+                UIHelper.showCustomToast(this@MainActivity, "Cache cleared for $selectedAppName")
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                UIHelper.showCustomToast(applicationContext, "Please select a valid app")
+                UIHelper.showCustomToast(this@MainActivity, "Please select a valid app")
             }
         }
 
@@ -219,10 +219,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.clearAppData(this, selectedPackage)
-                UIHelper.showCustomToast(applicationContext, "Data cleared for $selectedAppName")
+                UIHelper.showCustomToast(this@MainActivity, "Data cleared for $selectedAppName")
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                UIHelper.showCustomToast(applicationContext, "Please select a valid app")
+                UIHelper.showCustomToast(this@MainActivity, "Please select a valid app")
             }
         }
 
@@ -232,10 +232,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.forceStopApp(this, selectedPackage)
-                UIHelper.showCustomToast(applicationContext, "App stopped: $selectedAppName")
+                UIHelper.showCustomToast(this@MainActivity, "App stopped: $selectedAppName")
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                UIHelper.showCustomToast(applicationContext, "Please select a valid app")
+                UIHelper.showCustomToast(this@MainActivity, "Please select a valid app")
             }
         }
 
@@ -276,7 +276,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e(TAG, "Error reading USB mode", e)
                 withContext(Dispatchers.Main) {
-                    UIHelper.showCustomToast(applicationContext, "Failed to read USB mode")
+                    UIHelper.showCustomToast(this@MainActivity, "Failed to read USB mode")
 
                     if (currentUSBPosition != 0) {
                         isProgrammaticChange = true
@@ -310,10 +310,10 @@ class MainActivity : AppCompatActivity() {
                     withContext(Dispatchers.Main) {
                         if (isSuccess) {
                             currentUSBPosition = position
-                            UIHelper.showCustomToast(applicationContext, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}")
+                            UIHelper.showCustomToast(this@MainActivity, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}")
                             Log.i(TAG, "USB Mode successfully set to $newMode")
                         } else {
-                            UIHelper.showCustomToast(applicationContext, "Failed to set USB Mode")
+                            UIHelper.showCustomToast(this@MainActivity, "Failed to set USB Mode")
                             Log.e(TAG, "Failed to set USB Mode to $newMode")
 
                             isProgrammaticChange = true
