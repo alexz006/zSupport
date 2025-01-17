@@ -38,7 +38,10 @@ class MainActivity : AppCompatActivity() {
         "Антирадар HUD Speed" to "air.StrelkaHUDFREE",
         "AnyApp Store" to "com.anyapp.store",
         "AnyApp Zee Store" to "com.anyapp.zee.store",
-        "VK Store" to "ru.vk.store"
+        "VK Store" to "ru.vk.store",
+        "Яндекс Навигатор" to "ru.yandex.yandexnavi",
+        "YTube AA" to "com.carwizard.li.youtube",
+        "VK Video AA" to "com.anyapp.vkvideo"
     )
 
     private val usbHelper = SwitchUSBHelper()
@@ -349,6 +352,8 @@ class MainActivity : AppCompatActivity() {
         val permissionsHelper = PermissionsHelper()
 
         val installedApps = AppHelper.getInstalledApps(this).map { it.first }
+
+        Log.i(TAG, "Installed apps: $installedApps")
 
         val statusBuilder = StringBuilder()
         appNamesToPackages.forEach { (appName, packageName) ->
