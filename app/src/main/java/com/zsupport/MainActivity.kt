@@ -353,7 +353,7 @@ class MainActivity : AppCompatActivity() {
 
         val installedApps = AppHelper.getInstalledApps(this).map { it.first }
 
-        Log.i(TAG, "Installed apps: $installedApps")
+        //Log.i(TAG, "Installed apps: $installedApps")
 
         val statusBuilder = StringBuilder()
         appNamesToPackages.forEach { (appName, packageName) ->
