@@ -11,7 +11,10 @@ class PermissionsHelper {
         "com.anyapp.store" to listOf("android.permission.REQUEST_INSTALL_PACKAGES"),
         "com.anyapp.zee.store" to listOf("android.permission.REQUEST_INSTALL_PACKAGES"),
         "ru.vk.store" to listOf("android.permission.REQUEST_INSTALL_PACKAGES"),
-        "air.StrelkaHUDFREE" to listOf("android.permission.SYSTEM_ALERT_WINDOW", "deviceidle whitelist")
+        "air.StrelkaHUDFREE" to listOf("android.permission.SYSTEM_ALERT_WINDOW", "deviceidle whitelist"),
+        "ru.yandex.yandexnavi" to listOf("android.permission.SYSTEM_ALERT_WINDOW"),
+        "com.carwizard.li.youtube" to listOf("android.permission.SYSTEM_ALERT_WINDOW"),
+        "com.anyapp.vkvideo" to listOf("android.permission.SYSTEM_ALERT_WINDOW")
     )
 
     fun applyPermissions(context: Context, packageName: String) {
