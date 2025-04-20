@@ -43,7 +43,6 @@ class SwitchUSBHelper {
             val exitCode = process.exitValue()
 
             if (exitCode != 0) {
-                // Читаем поток ошибок
                 val errorStream = process.errorStream.bufferedReader().use { it.readText() }
                 Log.e(TAG, "setPropValue failed: Error output: $errorStream")
             }
