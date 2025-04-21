@@ -64,7 +64,8 @@ class MainActivity : AppCompatActivity() {
         "VK Store" to "ru.vk.store",
         "Яндекс Навигатор" to "ru.yandex.yandexnavi",
         "YTube AA" to "com.carwizard.li.youtube",
-        "VK Video AA" to "com.anyapp.vkvideo"
+        "VK Video AA" to "com.anyapp.vkvideo",
+        "Back Button" to "mavie.shadowsong.bb"
     )
 
     /**

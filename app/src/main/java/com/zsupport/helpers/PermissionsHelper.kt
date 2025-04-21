@@ -24,7 +24,8 @@ class PermissionsHelper {
         "air.StrelkaHUDFREE" to listOf("android.permission.SYSTEM_ALERT_WINDOW", "deviceidle whitelist"),
         "ru.yandex.yandexnavi" to listOf("android.permission.SYSTEM_ALERT_WINDOW"),
         "com.carwizard.li.youtube" to listOf("android.permission.SYSTEM_ALERT_WINDOW"),
-        "com.anyapp.vkvideo" to listOf("android.permission.SYSTEM_ALERT_WINDOW")
+        "com.anyapp.vkvideo" to listOf("android.permission.SYSTEM_ALERT_WINDOW"),
+        "mavie.shadowsong.bb" to listOf("android.permission.SYSTEM_ALERT_WINDOW", "accessibility_service")
     )
 
     /**
@@ -63,6 +64,14 @@ class PermissionsHelper {
                             addToWhitelist(packageName)
                         } else {
                             Log.i(TAG, "Package $packageName is already in Doze whitelist")
+                        }
+                    }
+                    "accessibility_service" -> {
+                        // Включаем службу специальных возможностей для пакета
+                        if (packageName == "mavie.shadowsong.bb") {
+                            enableAccessibilityService(context, packageName, "mavie.shadowsong.bb/refactory.backbutton.app.modules.sprite.SpriteAccessibilityService")
+                        } else {
+                            Log.e(TAG, "Unknown accessibility service for package $packageName")
                         }
                     }
                     else -> Log.e(TAG, "Unknown permission/action: $permission for $packageName")
@@ -232,6 +241,55 @@ class PermissionsHelper {
             Log.i(TAG, "Added $packageName to Doze whitelist")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to add $packageName to Doze whitelist: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Включает службу специальных возможностей для указанного пакета приложения.
+     * 
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения
+     * @param serviceClassName Полное имя класса службы специальных возможностей
+     */
+    private fun enableAccessibilityService(context: Context, packageName: String, serviceClassName: String) {
+        try {
+            // Получаем текущую строку включенных служб
+            val currentEnabledServices = android.provider.Settings.Secure.getString(
+                context.contentResolver,
+                android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            ) ?: ""
+            
+            // Проверяем, добавлена ли уже наша служба
+            if (currentEnabledServices.contains(serviceClassName)) {
+                Log.i(TAG, "Accessibility service $serviceClassName already enabled")
+                return
+            }
+            
+            // Добавляем нашу службу в список
+            val newEnabledServices = if (currentEnabledServices.isEmpty()) {
+                serviceClassName
+            } else {
+                "$currentEnabledServices:$serviceClassName"
+            }
+            
+            // Устанавливаем новое значение
+            android.provider.Settings.Secure.putString(
+                context.contentResolver,
+                android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                newEnabledServices
+            )
+            
+            // Включаем специальные возможности в целом, если они не включены
+            android.provider.Settings.Secure.putInt(
+                context.contentResolver,
+                android.provider.Settings.Secure.ACCESSIBILITY_ENABLED,
+                1
+            )
+            
+            Log.i(TAG, "Enabled accessibility service $serviceClassName for $packageName")
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to enable accessibility service for $packageName: ${e.message}", e)
         }
     }
 }
