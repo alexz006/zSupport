@@ -2,6 +2,7 @@ package com.zsupport.helpers
 
 import android.annotation.SuppressLint
 import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateInterpolator
@@ -14,6 +15,12 @@ import android.view.animation.DecelerateInterpolator
  * с элементами интерфейса.
  */
 class HoverUtils {
+
+    /**
+     * Создаем Handler с явным указанием основного потока для предотвращения утечек и соответствия
+     * рекомендациям Android для новых API.
+     */
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     /**
      * Применяет эффект анимации при нажатии и отпускании к указанным View.
@@ -32,7 +39,7 @@ class HoverUtils {
                             .start()
                     }
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                        Handler().postDelayed({
+                        mainHandler.postDelayed({
                             view.animate().scaleX(1f).scaleY(1f).setInterpolator(AccelerateInterpolator()).alpha(1f).start()
                         }, 80)
                     }
