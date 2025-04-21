@@ -3,6 +3,7 @@ package com.zsupport.helpers
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.PowerManager
 import android.util.Log
 import com.zsupport.R
@@ -55,6 +56,22 @@ object SystemHelper {
             Log.e(TAG, "Device is rebooting...")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to reboot: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Получает версию приложения из манифеста.
+     * 
+     * @param context Контекст приложения
+     * @return Строка с версией приложения или "Unknown" в случае ошибки
+     */
+    fun getAppVersion(context: Context): String {
+        return try {
+            val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            packageInfo.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.e(TAG, "Не удалось получить версию приложения: ${e.message}", e)
+            "Unknown"
         }
     }
 }

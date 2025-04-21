@@ -300,6 +300,16 @@
         android:textSize="14sp"
         android:text="" />
 
+    <TextView
+        android:id="@+id/versionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:textColor="?attr/mainText"
+        android:textSize="@dimen/boxAgreementTextSize"
+        android:text="" />
+
     <ImageButton
         android:id="@+id/keyboardButton"
         android:layout_width="48dp"

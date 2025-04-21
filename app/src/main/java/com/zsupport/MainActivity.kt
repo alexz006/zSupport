@@ -112,8 +112,13 @@ class MainActivity : AppCompatActivity() {
         val clearDataButton = findViewById<Button>(R.id.clearDataButton)
         val forceStopButton = findViewById<Button>(R.id.forceStopButton)
         val keyboardSelectButton = findViewById<ImageButton>(R.id.keyboardButton)
+        val versionTextView = findViewById<TextView>(R.id.versionTextView)
 
         val usbModeSwitcher = findViewById<SegmentedButtonGroup>(R.id.usbModeSwitcher)
+
+        // Устанавливаем текст версии приложения
+        val appVersion = SystemHelper.getAppVersion(this)
+        versionTextView.text = "v${appVersion}"
 
         val prefs = applicationContext.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
