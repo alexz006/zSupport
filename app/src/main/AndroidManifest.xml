@@ -27,7 +27,7 @@
         </activity>
 
         <receiver
-            android:name=".MainActivity$TimeZoneSyncReceiver"
+            android:name=".helpers.TimeZoneSyncReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
