@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.1"               # Совместимая версия Android Gradle Plugin
+agp = "8.8.1"               # Совместимая версия Android Gradle Plugin
 kotlin = "1.8.20"           # Совместимая версия Kotlin
 coreKtx = "1.8.0"           # Версия core-ktx для compileSdk 32
 junit = "4.13.2"
