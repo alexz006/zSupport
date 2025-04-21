@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+/app/release/zSupport-1.0-release.apk
+/app/release/baselineProfiles/0/zSupport-1.0-release.dm
+/app/release/baselineProfiles/1/zSupport-1.0-release.dm
