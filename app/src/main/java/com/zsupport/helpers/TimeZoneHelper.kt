@@ -76,23 +76,40 @@ class TimeZoneHelper {
      */
     fun setSystemTimeZonePermanent(context: Context, timeZoneId: String): Boolean {
         Log.i(TAG, "Setting permanent system timezone to $timeZoneId")
+        
+        // Шаг 1: Отключаем автоматическое определение часового пояса
+        setAutoTimeZoneEnabled(context, false)
+        
         try {
-            // Используем рефлексию для доступа к Settings.Global
-            val settingsGlobalClass = Class.forName("android.provider.Settings\$Global")
-            val putStringMethod = settingsGlobalClass.getDeclaredMethod(
-                "putString",
-                android.content.ContentResolver::class.java,
-                String::class.java,
-                String::class.java
-            )
+            // Шаг 2: Устанавливаем часовой пояс напрямую через Settings.Global
+            Settings.Global.putString(context.contentResolver, "time_zone", timeZoneId)
+            
+            // Шаг 3: Также используем метод через рефлексию для совместимости со старыми устройствами
+            try {
+                val settingsGlobalClass = Class.forName("android.provider.Settings\$Global")
+                val putStringMethod = settingsGlobalClass.getDeclaredMethod(
+                    "putString",
+                    android.content.ContentResolver::class.java,
+                    String::class.java,
+                    String::class.java
+                )
+                putStringMethod.invoke(null, context.contentResolver, "time_zone", timeZoneId)
+            } catch (e: Exception) {
+                Log.w(TAG, "Using reflection method failed, continuing with direct method: ${e.message}")
+            }
 
-            // Вызываем метод putString через рефлексию
-            putStringMethod.invoke(null, context.contentResolver, "time_zone", timeZoneId)
-
-            // Уведомляем систему об изменении времени
+            // Шаг 4: Активируем изменения через AlarmManager
             val success = changeSystemTimeZone(context, timeZoneId)
+            
+            // Шаг 5: Проверяем, что установка произошла корректно
+            val currentTimeZone = Settings.Global.getString(context.contentResolver, "time_zone")
+            Log.i(TAG, "Current timezone setting after change: $currentTimeZone")
+            
+            // Шаг 6: Уведомляем систему об изменении настроек
+            BackupManager.dataChanged("com.android.providers.settings")
+            
             Log.i(TAG, "System timezone set permanently to $timeZoneId")
-            return success
+            return true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to set timezone permanently: ${e.message}", e)
             return false

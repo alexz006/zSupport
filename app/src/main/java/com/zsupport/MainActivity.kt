@@ -224,11 +224,32 @@ class MainActivity : AppCompatActivity() {
             if (selectedTimeZoneId != null) {
                 val isPermanent = radioGroupTimezone.checkedRadioButtonId == R.id.radioPermanent
                 if (isPermanent) {
-                    timeZoneHelper.setSystemTimeZonePermanent(this, selectedTimeZoneId)
-                    timeZoneHelper.saveTimeZoneToPrefs(this, selectedTimeZoneId)
+                    // Отключаем автоматическое определение часового пояса
+                    timeZoneHelper.setAutoTimeZoneEnabled(this, false)
+                    
+                    // Применяем постоянное изменение часового пояса
+                    val success = timeZoneHelper.setSystemTimeZonePermanent(this, selectedTimeZoneId)
+                    
+                    if (success) {
+                        // Сохраняем в настройках только если успешно установили
+                        timeZoneHelper.saveTimeZoneToPrefs(this, selectedTimeZoneId)
+                        UIHelper.showCustomToast(this@MainActivity, "Timezone permanently set to ${selectedTimeZoneDisplay}")
+                        
+                        // Проверяем текущий часовой пояс для отладки
+                        val currentTimeZone = Settings.Global.getString(contentResolver, "time_zone")
+                        Log.i(TAG, "Current timezone setting after change: $currentTimeZone")
+                    } else {
+                        UIHelper.showCustomToast(this@MainActivity, getString(R.string.invalid_timezone_selected))
+                    }
                 } else {
-                    timeZoneHelper.changeSystemTimeZone(this, selectedTimeZoneId)
-                    timeZoneHelper.clearTimeZonePrefs(this)
+                    // Временное изменение часового пояса
+                    val success = timeZoneHelper.changeSystemTimeZone(this, selectedTimeZoneId)
+                    if (success) {
+                        UIHelper.showCustomToast(this@MainActivity, "Timezone temporarily set to ${selectedTimeZoneDisplay}")
+                        timeZoneHelper.clearTimeZonePrefs(this)
+                    } else {
+                        UIHelper.showCustomToast(this@MainActivity, getString(R.string.invalid_timezone_selected))
+                    }
                 }
             } else {
                 Log.e(TAG, "Selected timezone not found in available IDs.")
@@ -238,7 +259,22 @@ class MainActivity : AppCompatActivity() {
 
         // Настраиваем действие для чекбокса автоопределения часового пояса
         autoDetectCheckbox.setOnCheckedChangeListener { _, isChecked ->
-            timeZoneHelper.setAutoTimeZoneEnabled(this, !isChecked)
+            val success = timeZoneHelper.setAutoTimeZoneEnabled(this, !isChecked)
+            if (success) {
+                if (isChecked) {
+                    UIHelper.showCustomToast(this@MainActivity, "Auto timezone detection disabled")
+                } else {
+                    UIHelper.showCustomToast(this@MainActivity, "Auto timezone detection enabled")
+                }
+            }
+        }
+
+        // Проверяем и устанавливаем состояние чекбокса автоопределения
+        try {
+            val autoTimeZoneEnabled = Settings.Global.getInt(contentResolver, Settings.Global.AUTO_TIME_ZONE) == 1
+            autoDetectCheckbox.isChecked = !autoTimeZoneEnabled
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get auto timezone setting: ${e.message}", e)
         }
 
         // Скрываем клавиатуру при нажатии на корневой элемент
