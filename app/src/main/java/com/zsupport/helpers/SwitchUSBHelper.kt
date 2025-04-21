@@ -1,5 +1,6 @@
 package com.zsupport.helpers
 
+import android.content.Context
 import android.util.Log
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -8,11 +9,22 @@ import java.io.InputStreamReader
  * SwitchUSBHelper - вспомогательный класс для управления режимами работы USB.
  * 
  * Предоставляет методы для получения и установки режима работы USB порта устройства
- * через системные свойства (properties).
+ * через системные свойства (properties), а также сохранения настроек в SharedPreferences.
  */
 class SwitchUSBHelper {
 
     private val TAG = "AnyAppSwitchUSBHelper"
+
+    companion object {
+        // Константы для режимов USB
+        const val USB_MODE_HOST = "1"
+        const val USB_MODE_PERIPHERAL = "0"
+        
+        // Ключи для SharedPreferences
+        private const val PREFS_NAME = "app_prefs"
+        private const val AUTO_USB_MODE_KEY = "auto_usb_peripheral"
+        private const val SELECTED_USB_MODE_KEY = "selected_usb_mode"
+    }
 
     /**
      * Получает текущий режим работы USB.
@@ -96,5 +108,57 @@ class SwitchUSBHelper {
             "0" -> "peripheral"
             else -> "unknown"
         }
+    }
+    
+    /**
+     * Сохраняет выбранный режим USB в SharedPreferences.
+     *
+     * @param context Контекст приложения
+     * @param mode Режим USB
+     */
+    fun saveSelectedUsbMode(context: Context, mode: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(SELECTED_USB_MODE_KEY, mode)
+            .apply()
+        
+        Log.d(TAG, "Saved selected USB mode: $mode")
+    }
+    
+    /**
+     * Загружает сохраненный режим USB из SharedPreferences.
+     *
+     * @param context Контекст приложения
+     * @return Сохраненный режим USB или null, если не сохранен
+     */
+    fun loadSelectedUsbMode(context: Context): String? {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(SELECTED_USB_MODE_KEY, null)
+    }
+    
+    /**
+     * Включает или отключает автоматическое переключение в режим периферии при загрузке.
+     *
+     * @param context Контекст приложения
+     * @param enabled true для включения, false для отключения
+     */
+    fun setAutoPeripheralModeEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(AUTO_USB_MODE_KEY, enabled)
+            .apply()
+        
+        Log.d(TAG, "Auto USB peripheral mode ${if (enabled) "enabled" else "disabled"}")
+    }
+    
+    /**
+     * Проверяет, включено ли автоматическое переключение в режим периферии.
+     *
+     * @param context Контекст приложения
+     * @return true если включено, false в противном случае
+     */
+    fun isAutoPeripheralModeEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(AUTO_USB_MODE_KEY, false)
     }
 }

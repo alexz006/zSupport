@@ -17,6 +17,8 @@ import com.zsupport.helpers.HoverUtils
 import com.zsupport.helpers.KeyboardManager
 import com.zsupport.helpers.PermissionsHelper
 import com.zsupport.helpers.SystemHelper
+import com.zsupport.helpers.TimeZoneHelper
+import com.zsupport.helpers.TimeZoneSyncReceiver
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.atomic.AtomicBoolean
@@ -69,6 +71,11 @@ class MainActivity : AppCompatActivity() {
      * Вспомогательный объект для работы с USB режимами
      */
     private val usbHelper = SwitchUSBHelper()
+    
+    /**
+     * Вспомогательный объект для работы с часовыми поясами
+     */
+    private val timeZoneHelper = TimeZoneHelper()
     
     /**
      * Флаг для отслеживания программного изменения состояния.
@@ -150,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 
         // Преобразуем ID часовых поясов в читаемый формат
         val readableTimeZones = timeZoneIds
-            .map { timeZoneId -> Pair(timeZoneId, getReadableTimeZone(timeZoneId)) } // Создаем пары (ID, читаемый формат)
+            .map { timeZoneId -> Pair(timeZoneId, timeZoneHelper.getReadableTimeZone(timeZoneId)) } // Создаем пары (ID, читаемый формат)
             .sortedBy { TimeZone.getTimeZone(it.first).rawOffset } // Сортируем по смещению
             .map { it.second } // Оставляем только читаемый формат
 
@@ -191,33 +198,32 @@ class MainActivity : AppCompatActivity() {
         timezoneAutoComplete.hint = getString(R.string.select_timezone_hint)
 
         // Загружаем сохраненный часовой пояс, если он существует
-        val savedTimeZone = getTimeZoneFromPrefs()
+        val savedTimeZone = timeZoneHelper.getTimeZoneFromPrefs(this)
         if (!savedTimeZone.isNullOrEmpty()) {
-            timezoneAutoComplete.setText(getReadableTimeZone(savedTimeZone))
+            timezoneAutoComplete.setText(timeZoneHelper.getReadableTimeZone(savedTimeZone))
             radioGroupTimezone.check(R.id.radioPermanent)
             Log.i(TAG, "Loaded saved timezone: $savedTimeZone")
         }
 
         // Настраиваем действие для кнопки изменения часового пояса
         timezoneButton.setOnClickListener {
-
             hideKeyboard()
 
             val selectedTimeZoneDisplay = timezoneAutoComplete.text.toString()
 
             // Получаем идентификатор таймзоны на основе читаемого формата
             val selectedTimeZoneId = timeZoneIds.find { id ->
-                getReadableTimeZone(id) == selectedTimeZoneDisplay
+                timeZoneHelper.getReadableTimeZone(id) == selectedTimeZoneDisplay
             }
 
             if (selectedTimeZoneId != null) {
                 val isPermanent = radioGroupTimezone.checkedRadioButtonId == R.id.radioPermanent
                 if (isPermanent) {
-                    setSystemTimeZonePermanent(selectedTimeZoneId)
-                    saveTimeZoneToPrefs(selectedTimeZoneId)
+                    timeZoneHelper.setSystemTimeZonePermanent(this, selectedTimeZoneId)
+                    timeZoneHelper.saveTimeZoneToPrefs(this, selectedTimeZoneId)
                 } else {
-                    changeSystemTimeZone(selectedTimeZoneId)
-                    clearTimeZonePrefs()
+                    timeZoneHelper.changeSystemTimeZone(this, selectedTimeZoneId)
+                    timeZoneHelper.clearTimeZonePrefs(this)
                 }
             } else {
                 Log.e(TAG, "Selected timezone not found in available IDs.")
@@ -227,7 +233,7 @@ class MainActivity : AppCompatActivity() {
 
         // Настраиваем действие для чекбокса автоопределения часового пояса
         autoDetectCheckbox.setOnCheckedChangeListener { _, isChecked ->
-            setAutoTimeZoneEnabled(!isChecked)
+            timeZoneHelper.setAutoTimeZoneEnabled(this, !isChecked)
         }
 
         // Скрываем клавиатуру при нажатии на корневой элемент
@@ -364,15 +370,12 @@ class MainActivity : AppCompatActivity() {
                 coroutineScope.launch(Dispatchers.IO) {
                     var isSuccess = usbHelper.setUSBMode(newMode)
 
-                    //isSuccess = true // Remove this line after implementing the actual functionality
-
                     withContext(Dispatchers.Main) {
                         if (isSuccess) {
-
                             if (position == 2) {
-                                prefs.edit().putBoolean("auto_usb_peripheral", true).apply()
+                                usbHelper.setAutoPeripheralModeEnabled(this@MainActivity, true)
                             } else {
-                                prefs.edit().putBoolean("auto_usb_peripheral", false).apply()
+                                usbHelper.setAutoPeripheralModeEnabled(this@MainActivity, false)
                             }
 
                             currentUSBPosition.set(position)
@@ -450,182 +453,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun changeSystemTimeZone(timeZoneId: String) {
-        Log.i(TAG, "Changing system timezone to $timeZoneId")
-
-        try {
-            val alarmManagerClass = Class.forName("android.app.AlarmManager")
-            val setTimeZoneMethod = alarmManagerClass.getDeclaredMethod("setTimeZone", String::class.java)
-
-            val alarmManager = getSystemService(ALARM_SERVICE)
-            setTimeZoneMethod.invoke(alarmManager, timeZoneId)
-
-            BackupManager.dataChanged("com.android.providers.settings")
-            Log.i(TAG, "System timezone updated successfully to $timeZoneId")
-
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to change timezone: ${e.message}", e)
-        }
-    }
-
-    private fun setSystemTimeZonePermanent(timeZoneId: String) {
-        Log.i(TAG, "Setting permanent system timezone to $timeZoneId")
-        try {
-            // Используем рефлексию для доступа к Settings.Global
-            val settingsGlobalClass = Class.forName("android.provider.Settings\$Global")
-            val putStringMethod = settingsGlobalClass.getDeclaredMethod(
-                "putString",
-                android.content.ContentResolver::class.java,
-                String::class.java,
-                String::class.java
-            )
-
-            // Вызываем метод putString через рефлексию
-            putStringMethod.invoke(null, contentResolver, "time_zone", timeZoneId)
-
-            // Уведомляем систему об изменении времени
-            val amnClass = Class.forName("android.app.AlarmManager")
-            val amnInstance = getSystemService(ALARM_SERVICE)
-            val setTimeZoneMethod = amnClass.getDeclaredMethod("setTimeZone", String::class.java)
-            setTimeZoneMethod.invoke(amnInstance, timeZoneId)
-
-            Log.i(TAG, "System timezone set permanently to $timeZoneId")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to set timezone permanently: ${e.message}", e)
-        }
-    }
-
-
-    private fun setAutoTimeZoneEnabled(enabled: Boolean) {
-        try {
-            Settings.Global.putInt(contentResolver, Settings.Global.AUTO_TIME_ZONE, if (enabled) 1 else 0)
-            Log.i(TAG, "Auto timezone detection set to ${if (enabled) "enabled" else "disabled"}")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to change auto timezone setting: ${e.message}", e)
-        }
-    }
-
-    // Функция для преобразования часового пояса в читаемый формат
-    fun getReadableTimeZone(timeZoneId: String): String {
-        val timeZone = TimeZone.getTimeZone(timeZoneId)
-        val offset = timeZone.rawOffset / (60 * 60 * 1000) // Смещение в часах
-        val offsetMinutes = Math.abs(timeZone.rawOffset / (60 * 1000) % 60) // Минуты для неполных часов
-        val offsetSign = if (offset >= 0) "+" else "-"
-        val gmtOffset = if (offsetMinutes > 0) {
-            "GMT$offsetSign$offset:${String.format("%02d", offsetMinutes)}"
-        } else {
-            "GMT$offsetSign$offset"
-        }
-
-        val cityName = timeZoneId.substringAfterLast('/') // Получаем название города/области
-            .replace('_', ' ') // Преобразуем подчеркивания в пробелы
-
-        //Log.i(TAG, "CityName: $cityName GMT: $gmtOffset")
-
-        return "$cityName ($gmtOffset)"
-    }
-
-    private fun saveTimeZoneToPrefs(timeZoneId: String) {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        prefs.edit().putString("selected_time_zone", timeZoneId).apply()
-        Log.i(TAG, "TimeZone saved to prefs: $timeZoneId")
-    }
-
-    private fun getTimeZoneFromPrefs(): String? {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        return prefs.getString("selected_time_zone", null)
-    }
-
-    private fun clearTimeZonePrefs() {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        prefs.edit().remove("selected_time_zone").apply()
-    }
-
-    /**
-     * BroadcastReceiver для синхронизации настроек часового пояса и USB режима
-     * при загрузке устройства.
-     * 
-     * Реагирует на интент ACTION_BOOT_COMPLETED, восстанавливая сохраненные настройки
-     * из SharedPreferences.
-     */
-    class TimeZoneSyncReceiver : BroadcastReceiver() {
-
-        val TAG = "AnyAppSupport"
-
-        override fun onReceive(context: Context, intent: Intent?) {
-            if (intent?.action != Intent.ACTION_BOOT_COMPLETED) {
-                return
-            }
-
-            Log.d(TAG, "Received boot completed intent")
-            Log.d(TAG, "Context class: ${context.javaClass.name}")
-
-            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-            
-            // Обрабатываем настройки USB режима
-            handleUsbMode(context, prefs)
-            
-            // Обрабатываем настройки часового пояса
-            handleTimeZone(context, prefs)
-        }
-        
-        /**
-         * Обрабатывает настройки USB режима при загрузке устройства
-         */
-        private fun handleUsbMode(context: Context, prefs: android.content.SharedPreferences) {
-            val isAutoUSBperipheral = prefs.getBoolean("auto_usb_peripheral", false)
-            Log.d(TAG, "Auto USB peripheral mode: $isAutoUSBperipheral")
-            
-            if (!isAutoUSBperipheral) {
-                return
-            }
-            
-            // Создаем SwitchUSBHelper только если нужно установить режим peripheral
-            try {
-                val usbHelper = SwitchUSBHelper()
-                val success = usbHelper.setUSBMode("0")
-                if (success) {
-                    Log.d(TAG, "USB mode switched to peripheral on system boot")
-                } else {
-                    Log.e(TAG, "Failed to switch USB mode to peripheral")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Exception while switching USB mode on system boot", e)
-            }
-        }
-        
-        /**
-         * Обрабатывает настройки часового пояса при загрузке устройства
-         */
-        private fun handleTimeZone(context: Context, prefs: android.content.SharedPreferences) {
-            val selectedTimeZone = prefs.getString("selected_time_zone", null)
-            if (selectedTimeZone.isNullOrEmpty()) {
-                return
-            }
-            
-            try {
-                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? android.app.AlarmManager
-                if (alarmManager == null) {
-                    Log.e(TAG, "Failed to get AlarmManager service")
-                    return
-                }
-                
-                try {
-                    // Используем безопасный подход к рефлексии
-                    val setTimeZoneMethod = android.app.AlarmManager::class.java.getDeclaredMethod("setTimeZone", String::class.java)
-                    setTimeZoneMethod.invoke(alarmManager, selectedTimeZone)
-                    Log.i(TAG, "Time zone synchronized to $selectedTimeZone")
-                } catch (e: NoSuchMethodException) {
-                    Log.e(TAG, "Method setTimeZone not found on AlarmManager", e)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to set time zone via reflection", e)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to synchronize time zone: ${e.message}", e)
-            }
-        }
-    }
-
     private fun hideKeyboard() {
         val view = this.currentFocus
         if (view != null) {
@@ -633,7 +460,6 @@ class MainActivity : AppCompatActivity() {
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
-
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun updateButtonState(button: Button, isEnabled: Boolean) {
