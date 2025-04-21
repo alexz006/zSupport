@@ -3,10 +3,20 @@ package com.zsupport.helpers
 import android.content.Context
 import android.util.Log
 
+/**
+ * PermissionsHelper - вспомогательный класс для управления разрешениями приложений.
+ * 
+ * Предоставляет методы для установки и проверки различных типов разрешений для приложений,
+ * включая стандартные разрешения Android Runtime Permissions, разрешения AppOps и добавление
+ * приложений в белый список Doze.
+ */
 class PermissionsHelper {
 
     val TAG = "AnyAppPermissionsHelper"
 
+    /**
+     * Карта соответствия пакетов приложений и необходимых им разрешений
+     */
     private val packagePermissionsMap = mutableMapOf(
         "com.anyapp.store" to listOf("android.permission.REQUEST_INSTALL_PACKAGES"),
         "com.anyapp.zee.store" to listOf("android.permission.REQUEST_INSTALL_PACKAGES"),
@@ -17,6 +27,13 @@ class PermissionsHelper {
         "com.anyapp.vkvideo" to listOf("android.permission.SYSTEM_ALERT_WINDOW")
     )
 
+    /**
+     * Применяет необходимые разрешения для указанного пакета приложения.
+     * В зависимости от типа разрешения, вызывает соответствующие методы для его установки.
+     * 
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения, для которого необходимо установить разрешения
+     */
     fun applyPermissions(context: Context, packageName: String) {
         val permissions = packagePermissionsMap[packageName]
         if (permissions.isNullOrEmpty()) {
@@ -56,6 +73,14 @@ class PermissionsHelper {
         }
     }
 
+    /**
+     * Проверяет, предоставлено ли приложению указанное разрешение времени выполнения.
+     * 
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения для проверки
+     * @param permission Разрешение для проверки
+     * @return true если разрешение предоставлено, false в противном случае или при ошибке
+     */
     private fun isRuntimePermissionGranted(context: Context, packageName: String, permission: String): Boolean {
         return try {
             val packageManager = context.packageManager
@@ -66,6 +91,15 @@ class PermissionsHelper {
         }
     }
 
+    /**
+     * Проверяет, предоставлено ли приложению указанное разрешение AppOps.
+     * Использует рефлексию для доступа к AppOpsManager.
+     * 
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения
+     * @param appOp Операция AppOps для проверки
+     * @return true если разрешение предоставлено, false в противном случае или при ошибке
+     */
     private fun isAppOpsPermissionGranted(context: Context, packageName: String, appOp: String): Boolean {
         return try {
             val appOpsManagerClass = Class.forName("android.app.AppOpsManager")
@@ -88,6 +122,12 @@ class PermissionsHelper {
         }
     }
 
+    /**
+     * Проверяет, добавлено ли приложение в белый список оптимизации энергопотребления (Doze).
+     * 
+     * @param packageName Имя пакета приложения для проверки
+     * @return true если приложение в белом списке, false в противном случае или при ошибке
+     */
     private fun isInDozeWhitelist(packageName: String): Boolean {
         return try {
             val serviceManagerClass = Class.forName("android.os.ServiceManager")
@@ -108,6 +148,14 @@ class PermissionsHelper {
         }
     }
 
+    /**
+     * Устанавливает разрешение AppOps для указанного приложения.
+     * 
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения
+     * @param appOp Операция AppOps для установки
+     * @param mode Режим ("allow" или "ignore")
+     */
     private fun setAppOpsPermission(context: Context, packageName: String, appOp: String, mode: String) {
         try {
             val appOpsManagerClass = Class.forName("android.app.AppOpsManager")
@@ -135,6 +183,13 @@ class PermissionsHelper {
         }
     }
 
+    /**
+     * Предоставляет разрешение времени выполнения (Runtime Permission) указанному приложению.
+     * 
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения
+     * @param permission Разрешение для предоставления
+     */
     private fun grantRuntimePermission(context: Context, packageName: String, permission: String) {
         try {
             val packageManager = context.packageManager
@@ -157,6 +212,11 @@ class PermissionsHelper {
         }
     }
 
+    /**
+     * Добавляет приложение в белый список оптимизации энергопотребления (Doze).
+     * 
+     * @param packageName Имя пакета приложения для добавления в белый список
+     */
     private fun addToWhitelist(packageName: String) {
         try {
             val serviceManagerClass = Class.forName("android.os.ServiceManager")

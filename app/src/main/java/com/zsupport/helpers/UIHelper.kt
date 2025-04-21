@@ -6,8 +6,21 @@ import android.widget.TextView
 import android.widget.Toast
 import com.zsupport.R
 
+/**
+ * UIHelper - вспомогательный класс для UI операций.
+ * 
+ * Предоставляет методы для отображения пользовательских уведомлений
+ * и других UI элементов.
+ */
 object UIHelper {
 
+    /**
+     * Отображает кастомный Toast с заданным сообщением.
+     * Использует собственный макет для стилизации уведомления.
+     * 
+     * @param context Контекст приложения
+     * @param message Текст сообщения для отображения
+     */
     fun showCustomToast(context: Context, message: String) {
         // Inflate custom toast layout
         val inflater = LayoutInflater.from(context)

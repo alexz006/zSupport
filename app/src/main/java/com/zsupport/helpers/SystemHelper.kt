@@ -6,12 +6,18 @@ import android.content.Intent
 import android.os.PowerManager
 import android.util.Log
 
+/**
+ * SystemHelper - вспомогательный класс для выполнения системных операций,
+ * таких как перезагрузка устройства.
+ */
 object SystemHelper {
 
     private const val TAG = "SystemHelper"
 
     /**
-     * Показывает диалог для подтверждения перезагрузки.
+     * Показывает диалог для подтверждения перезагрузки устройства.
+     * 
+     * @param context Контекст приложения
      */
     fun showRebootDialog(context: Context) {
         AlertDialog.Builder(context)
@@ -25,7 +31,11 @@ object SystemHelper {
     }
 
     /**
-     * Инициирует безопасную перезагрузку с уведомлением.
+     * Инициирует безопасную перезагрузку устройства.
+     * Отправляет системный интент ACTION_SHUTDOWN для уведомления других приложений
+     * о предстоящей перезагрузке, а затем выполняет саму перезагрузку.
+     * 
+     * @param context Контекст приложения
      */
     private fun initiateReboot(context: Context) {
         try {

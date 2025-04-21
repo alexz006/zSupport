@@ -7,10 +7,23 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 
-class HoverUtils{
+/**
+ * HoverUtils - вспомогательный класс для добавления эффектов наведения (hover) к UI элементам.
+ * 
+ * Предоставляет функционал для создания анимированных эффектов при взаимодействии пользователя
+ * с элементами интерфейса.
+ */
+class HoverUtils {
 
+    /**
+     * Применяет эффект анимации при нажатии и отпускании к указанным View.
+     * При нажатии (ACTION_DOWN) элемент немного уменьшается, создавая эффект нажатия.
+     * При отпускании (ACTION_UP, ACTION_CANCEL) элемент возвращается к исходному размеру.
+     * 
+     * @param views Варарг объектов View, к которым будет применен эффект
+     */
     @SuppressLint("ClickableViewAccessibility")
-    fun setHover(vararg views : View){
+    fun setHover(vararg views : View) {
         for (obj in views) {
             obj.setOnTouchListener(View.OnTouchListener { view, motionEvent ->
                 when (motionEvent.action) {
@@ -28,5 +41,4 @@ class HoverUtils{
             })
         }
     }
-
 }

@@ -28,12 +28,24 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.zsupport.helpers.UIHelper
 
-
+/**
+ * MainActivity - основной класс приложения, реализующий управление системными настройками
+ * автомобильного головного устройства.
+ *
+ * Основные возможности:
+ * - Изменение языка системы (китайский/английский)
+ * - Управление часовым поясом (временно/постоянно)
+ * - Управление приложениями (очистка кэша/данных, принудительная остановка)
+ * - Переключение режимов USB (Host/Peripheral/Auto)
+ * - Доступ к выбору клавиатуры
+ */
 class MainActivity : AppCompatActivity() {
     
     val TAG = "AnyAppSupport"
 
-    // Мапа названий приложений и их пакетов
+    /**
+     * Карта известных приложений с сопоставлением их названий и пакетов
+     */
     private val appNamesToPackages = mapOf(
         "Антирадар HUD Speed" to "air.StrelkaHUDFREE",
         "AnyApp Store" to "com.anyapp.store",
@@ -44,11 +56,26 @@ class MainActivity : AppCompatActivity() {
         "VK Video AA" to "com.anyapp.vkvideo"
     )
 
+    /**
+     * Вспомогательный объект для работы с USB режимами
+     */
     private val usbHelper = SwitchUSBHelper()
+    
+    /**
+     * Флаг для отслеживания программного изменения состояния
+     */
     private var isProgrammaticChange = false
-    private var currentUSBPosition: Int = -1 // Текущая позиция (инициализация значением, которого не бывает)
+    
+    /**
+     * Текущая позиция переключателя USB режимов
+     * Инициализируется значением -1, которое не соответствует ни одному состоянию
+     */
+    private var currentUSBPosition: Int = -1
 
-
+    /**
+     * Инициализация активности
+     * Настраивает UI элементы и обработчики событий
+     */
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +99,7 @@ class MainActivity : AppCompatActivity() {
 
         val prefs = applicationContext.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
+        // Настраиваем эффект при наведении для кнопок
         HoverUtils().setHover(chineseButton, englishButton, timezoneButton, clearCacheButton, clearDataButton, forceStopButton, keyboardSelectButton)
 
         // Начально деактивируем кнопки
@@ -103,11 +131,13 @@ class MainActivity : AppCompatActivity() {
             hideKeyboard()
         }
 
+        // Получаем список всех доступных часовых поясов
         val timeZoneIds = TimeZone.getAvailableIDs()
 
         Log.i(TAG, "Timezone IDs: ${timeZoneIds.size}")
         Log.i(TAG, "Timezone IDs: ${timeZoneIds}")
 
+        // Преобразуем ID часовых поясов в читаемый формат
         val readableTimeZones = timeZoneIds
             .map { timeZoneId -> Pair(timeZoneId, getReadableTimeZone(timeZoneId)) } // Создаем пары (ID, читаемый формат)
             .sortedBy { TimeZone.getTimeZone(it.first).rawOffset } // Сортируем по смещению
@@ -115,6 +145,7 @@ class MainActivity : AppCompatActivity() {
 
         val mutableTimeZoneIds = readableTimeZones.toMutableList() // Создаём изменяемую копию списка
 
+        // Создаем адаптер для выпадающего списка с фильтрацией
         val adapter = object : ArrayAdapter<String>(this, R.layout.custom_spinner_item, mutableTimeZoneIds) {
             override fun getFilter(): Filter {
                 return object : Filter() {
@@ -142,11 +173,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
+        // Настраиваем поле выбора часового пояса
         val timezoneAutoComplete = findViewById<AutoCompleteTextView>(R.id.timezoneAutoComplete)
         timezoneAutoComplete.setAdapter(adapter)
         timezoneAutoComplete.threshold = 1 // Поиск начинается после ввода первого символа
 
+        // Загружаем сохраненный часовой пояс, если он существует
         val savedTimeZone = getTimeZoneFromPrefs()
         if (!savedTimeZone.isNullOrEmpty()) {
             timezoneAutoComplete.setText(getReadableTimeZone(savedTimeZone))
@@ -154,6 +186,7 @@ class MainActivity : AppCompatActivity() {
             Log.i(TAG, "Loaded saved timezone: $savedTimeZone")
         }
 
+        // Настраиваем действие для кнопки изменения часового пояса
         timezoneButton.setOnClickListener {
 
             hideKeyboard()
@@ -180,10 +213,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Настраиваем действие для чекбокса автоопределения часового пояса
         autoDetectCheckbox.setOnCheckedChangeListener { _, isChecked ->
             setAutoTimeZoneEnabled(!isChecked)
         }
 
+        // Скрываем клавиатуру при нажатии на корневой элемент
         findViewById<FrameLayout>(R.id.rootLayout).setOnTouchListener { _, _ ->
             hideKeyboard()
             false

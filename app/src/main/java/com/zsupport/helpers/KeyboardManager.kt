@@ -9,10 +9,23 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.zsupport.R
 
+/**
+ * KeyboardManager - класс для управления клавиатурами на устройстве.
+ * 
+ * Реализует паттерн Singleton для обеспечения единой точки доступа к функциональности
+ * управления клавиатурами. Позволяет проверять наличие, включать и выбирать различные
+ * клавиатуры в системе.
+ */
 class KeyboardManager private constructor() {
 
     companion object {
         private var instance: KeyboardManager? = null
+        
+        /**
+         * Возвращает единственный экземпляр класса KeyboardManager (Singleton).
+         * 
+         * @return Экземпляр KeyboardManager
+         */
         fun getInstance(): KeyboardManager {
             if (instance == null) {
                 instance = KeyboardManager()
@@ -21,6 +34,9 @@ class KeyboardManager private constructor() {
         }
     }
 
+    /**
+     * Карта поддерживаемых клавиатур с сопоставлением имен и их идентификаторов
+     */
     private val supportedKeyboards = mapOf(
         "Gboard" to "com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME",
         "Yandex Keyboard" to "ru.yandex.androidkeyboard/com.android.inputmethod.latin.LatinIME",
@@ -30,7 +46,11 @@ class KeyboardManager private constructor() {
     private val TAG = "KeyboardManager"
 
     /**
-     * Проверяет, установлена ли клавиатура по пакету.
+     * Проверяет, установлена ли клавиатура по идентификатору пакета.
+     * 
+     * @param context Контекст приложения
+     * @param packageName Идентификатор пакета клавиатуры
+     * @return true если клавиатура установлена, false в противном случае
      */
     fun isKeyboardInstalled(context: Context, packageName: String): Boolean {
         Log.d(TAG, "Checking if keyboard is installed: $packageName")
@@ -46,7 +66,11 @@ class KeyboardManager private constructor() {
     }
 
     /**
-     * Включает клавиатуру в настройках.
+     * Включает указанную клавиатуру в настройках системы.
+     * Добавляет клавиатуру в список разрешенных методов ввода.
+     * 
+     * @param context Контекст приложения
+     * @param inputMethod Идентификатор метода ввода (клавиатуры)
      */
     fun enableKeyboard(context: Context, inputMethod: String) {
         Log.d(TAG, "Enabling keyboard: $inputMethod")
@@ -79,7 +103,10 @@ class KeyboardManager private constructor() {
     }
 
     /**
-     * Выбирает клавиатуру как основную.
+     * Устанавливает указанную клавиатуру как метод ввода по умолчанию.
+     * 
+     * @param context Контекст приложения
+     * @param inputMethod Идентификатор метода ввода (клавиатуры)
      */
     fun selectKeyboard(context: Context, inputMethod: String) {
         Log.d(TAG, "Selecting keyboard: $inputMethod")
@@ -96,7 +123,10 @@ class KeyboardManager private constructor() {
     }
 
     /**
-     * Возвращает текущую выбранную клавиатуру.
+     * Возвращает идентификатор клавиатуры, выбранной в данный момент как метод ввода по умолчанию.
+     * 
+     * @param context Контекст приложения
+     * @return Идентификатор текущего метода ввода или null в случае ошибки
      */
     fun getCurrentKeyboard(context: Context): String? {
         return try {
@@ -113,7 +143,10 @@ class KeyboardManager private constructor() {
     }
 
     /**
-     * Конфигурация и выбор клавиатуры.
+     * Выполняет проверку наличия, включение и выбор указанной клавиатуры.
+     * 
+     * @param context Контекст приложения
+     * @param keyboardName Название клавиатуры из списка поддерживаемых
      */
     fun configureAndSelectKeyboard(context: Context, keyboardName: String) {
         val inputMethod = supportedKeyboards[keyboardName]
@@ -130,6 +163,11 @@ class KeyboardManager private constructor() {
         }
     }
 
+    /**
+     * Отображает диалоговое окно выбора клавиатуры с возможностью смены текущего метода ввода.
+     * 
+     * @param context Контекст приложения
+     */
     fun showKeyboardDialog(context: Context) {
         Log.d(TAG, "Showing keyboard selection dialog")
 
@@ -142,6 +180,10 @@ class KeyboardManager private constructor() {
         val yandexButton = dialogView.findViewById<android.widget.Button>(R.id.yandexButton)
         val microsoftButton = dialogView.findViewById<android.widget.Button>(R.id.msswiftButton)
 
+        /**
+         * Обновляет UI диалога в соответствии с текущим выбранным методом ввода.
+         * Выделяет кнопку активной клавиатуры.
+         */
         fun updateUI() {
             val currentKeyboard = getCurrentKeyboard(context)
             val currentKeyboardName = supportedKeyboards.entries.find { it.value == currentKeyboard }?.key ?: "Unknown"
@@ -188,6 +230,4 @@ class KeyboardManager private constructor() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
     }
-
-
 }

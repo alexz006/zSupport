@@ -6,8 +6,20 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.util.Log
 
+/**
+ * AppHelper - вспомогательный класс для управления приложениями на устройстве.
+ * 
+ * Предоставляет функциональность для:
+ * - Получения списка установленных приложений
+ * - Принудительной остановки приложений
+ * - Очистки кэша приложений
+ * - Очистки данных приложений
+ */
 object AppHelper {
 
+    /**
+     * Карта соответствия пакетов и требуемых разрешений
+     */
     private val packagePermissionsMap = mutableMapOf(
         "com.anyapp.store" to listOf("REQUEST_INSTALL_PACKAGES"),
         "com.anyapp.zee.store" to listOf("REQUEST_INSTALL_PACKAGES"),
@@ -15,14 +27,24 @@ object AppHelper {
         "air.StrelkaHUDFREE" to listOf("android.permission.SYSTEM_ALERT_WINDOW", "deviceidle whitelist")
     )
 
-    // Получить список запущенных приложений
+    /**
+     * Получает список запущенных приложений
+     *
+     * @param context Контекст приложения
+     * @return Список имен пакетов запущенных приложений
+     */
     fun getRunningApps(context: Context): List<String> {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val runningTasks = activityManager.runningAppProcesses
         return runningTasks?.map { it.processName } ?: emptyList()
     }
 
-    // Форс-стоп приложения
+    /**
+     * Принудительно останавливает указанное приложение
+     *
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения для остановки
+     */
     fun forceStopApp(context: Context, packageName: String) {
         try {
             val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -34,6 +56,12 @@ object AppHelper {
         }
     }
 
+    /**
+     * Очищает кэш указанного приложения
+     *
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения для очистки кэша
+     */
     fun clearAppCache(context: Context, packageName: String) {
         try {
             // Получение IPackageManager через рефлексию
@@ -73,7 +101,12 @@ object AppHelper {
         }
     }
 
-
+    /**
+     * Очищает данные указанного приложения
+     *
+     * @param context Контекст приложения
+     * @param packageName Имя пакета приложения для очистки данных
+     */
     fun clearAppData(context: Context, packageName: String) {
         try {
             val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -110,9 +143,12 @@ object AppHelper {
         }
     }
 
-
-
-    // Получить список пользовательских приложений
+    /**
+     * Получает список установленных пользовательских приложений
+     *
+     * @param context Контекст приложения
+     * @return Список пар (имя пакета, название приложения)
+     */
     fun getInstalledApps(context: Context): List<Pair<String, String>> {
         val packageManager = context.packageManager
         val apps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
