@@ -540,42 +540,87 @@ class MainActivity : AppCompatActivity() {
         prefs.edit().remove("selected_time_zone").apply()
     }
 
+    /**
+     * BroadcastReceiver для синхронизации настроек часового пояса и USB режима
+     * при загрузке устройства.
+     * 
+     * Реагирует на интент ACTION_BOOT_COMPLETED, восстанавливая сохраненные настройки
+     * из SharedPreferences.
+     */
     class TimeZoneSyncReceiver : BroadcastReceiver() {
 
         val TAG = "AnyAppSupport"
 
         override fun onReceive(context: Context, intent: Intent?) {
+            if (intent?.action != Intent.ACTION_BOOT_COMPLETED) {
+                return
+            }
 
+            Log.d(TAG, "Received boot completed intent")
             Log.d(TAG, "Context class: ${context.javaClass.name}")
 
-            if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                val selectedTimeZone = prefs.getString("selected_time_zone", null)
-                val isAutoUSBperitheral = prefs.getBoolean("auto_usb_peripheral", false)
-
-                Log.d(TAG, "Auto USB peripheral mode: $isAutoUSBperitheral.")
-
-                if (isAutoUSBperitheral) {
-                    try {
-                        val usbHelper = SwitchUSBHelper()
-                        usbHelper.setUSBMode("0")
-                        Log.d(TAG, "USB mode switched to peripheral on system boot.")
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to switch USB mode on system boot: ${e.message}", e)
-                    }
+            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            
+            // Обрабатываем настройки USB режима
+            handleUsbMode(context, prefs)
+            
+            // Обрабатываем настройки часового пояса
+            handleTimeZone(context, prefs)
+        }
+        
+        /**
+         * Обрабатывает настройки USB режима при загрузке устройства
+         */
+        private fun handleUsbMode(context: Context, prefs: android.content.SharedPreferences) {
+            val isAutoUSBperipheral = prefs.getBoolean("auto_usb_peripheral", false)
+            Log.d(TAG, "Auto USB peripheral mode: $isAutoUSBperipheral")
+            
+            if (!isAutoUSBperipheral) {
+                return
+            }
+            
+            // Создаем SwitchUSBHelper только если нужно установить режим peripheral
+            try {
+                val usbHelper = SwitchUSBHelper()
+                val success = usbHelper.setUSBMode("0")
+                if (success) {
+                    Log.d(TAG, "USB mode switched to peripheral on system boot")
+                } else {
+                    Log.e(TAG, "Failed to switch USB mode to peripheral")
                 }
-
-                if (!selectedTimeZone.isNullOrEmpty()) {
-                    try {
-                        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
-                        val setTimeZoneMethod = android.app.AlarmManager::class.java.getDeclaredMethod("setTimeZone", String::class.java)
-                        setTimeZoneMethod.invoke(alarmManager, selectedTimeZone)
-
-                        Log.i(TAG, "Time zone synchronized to $selectedTimeZone")
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to synchronize time zone: ${e.message}", e)
-                    }
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception while switching USB mode on system boot", e)
+            }
+        }
+        
+        /**
+         * Обрабатывает настройки часового пояса при загрузке устройства
+         */
+        private fun handleTimeZone(context: Context, prefs: android.content.SharedPreferences) {
+            val selectedTimeZone = prefs.getString("selected_time_zone", null)
+            if (selectedTimeZone.isNullOrEmpty()) {
+                return
+            }
+            
+            try {
+                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? android.app.AlarmManager
+                if (alarmManager == null) {
+                    Log.e(TAG, "Failed to get AlarmManager service")
+                    return
                 }
+                
+                try {
+                    // Используем безопасный подход к рефлексии
+                    val setTimeZoneMethod = android.app.AlarmManager::class.java.getDeclaredMethod("setTimeZone", String::class.java)
+                    setTimeZoneMethod.invoke(alarmManager, selectedTimeZone)
+                    Log.i(TAG, "Time zone synchronized to $selectedTimeZone")
+                } catch (e: NoSuchMethodException) {
+                    Log.e(TAG, "Method setTimeZone not found on AlarmManager", e)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to set time zone via reflection", e)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to synchronize time zone: ${e.message}", e)
             }
         }
     }
