@@ -24,8 +24,10 @@ import com.addisonelliott.segmentedbutton.SegmentedButtonGroup
 import com.zsupport.helpers.SwitchUSBHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.cancel
 import com.zsupport.helpers.UIHelper
 
 /**
@@ -42,6 +44,11 @@ import com.zsupport.helpers.UIHelper
 class MainActivity : AppCompatActivity() {
     
     val TAG = "AnyAppSupport"
+    
+    /**
+     * Scope для запуска корутин, привязанный к жизненному циклу активности
+     */
+    private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     /**
      * Карта известных приложений с сопоставлением их названий и пакетов
@@ -290,7 +297,7 @@ class MainActivity : AppCompatActivity() {
         //////////////////////////////////////////////////////////////////////////
 
 
-        CoroutineScope(Dispatchers.IO).launch {
+        coroutineScope.launch(Dispatchers.IO) {
             try {
                 val currentUSBMode = usbHelper.getUSBMode()
                 Log.i(TAG, "Current USB mode: ${usbHelper.formatUsbMode(currentUSBMode)}")
@@ -350,7 +357,7 @@ class MainActivity : AppCompatActivity() {
 
                 val newMode = if (position == 0 || position == 2) "0" else "1"
 
-                CoroutineScope(Dispatchers.IO).launch {
+                coroutineScope.launch(Dispatchers.IO) {
                     var isSuccess = usbHelper.setUSBMode(newMode)
 
                     //isSuccess = true // Remove this line after implementing the actual functionality
@@ -404,7 +411,14 @@ class MainActivity : AppCompatActivity() {
 
         statusTextView.text = statusBuilder.toString().trim()
     }
-
+    
+    /**
+     * Отменяем все запущенные корутины при уничтожении активности
+     */
+    override fun onDestroy() {
+        coroutineScope.cancel() // Отменяем все корутины
+        super.onDestroy()
+    }
 
     private fun changeSystemLanguage(locale: Locale) {
         Log.i(TAG, "Changing system language to $locale")
@@ -579,7 +593,4 @@ class MainActivity : AppCompatActivity() {
         button.setTextAppearance(this, style)
         button.background = getDrawable(if (isEnabled) R.drawable.custom_button_background else R.drawable.custom_button_off_background)
     }
-
-
-
 }
