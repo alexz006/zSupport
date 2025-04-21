@@ -19,6 +19,8 @@ import com.zsupport.helpers.PermissionsHelper
 import com.zsupport.helpers.SystemHelper
 import java.util.Locale
 import java.util.TimeZone
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import android.widget.ArrayAdapter
 import com.addisonelliott.segmentedbutton.SegmentedButtonGroup
 import com.zsupport.helpers.SwitchUSBHelper
@@ -69,15 +71,17 @@ class MainActivity : AppCompatActivity() {
     private val usbHelper = SwitchUSBHelper()
     
     /**
-     * Флаг для отслеживания программного изменения состояния
+     * Флаг для отслеживания программного изменения состояния.
+     * Используется AtomicBoolean для потокобезопасных операций.
      */
-    private var isProgrammaticChange = false
+    private val isProgrammaticChange = AtomicBoolean(false)
     
     /**
      * Текущая позиция переключателя USB режимов
-     * Инициализируется значением -1, которое не соответствует ни одному состоянию
+     * Инициализируется значением -1, которое не соответствует ни одному состоянию.
+     * Используется AtomicInteger для потокобезопасных операций.
      */
-    private var currentUSBPosition: Int = -1
+    private val currentUSBPosition = AtomicInteger(-1)
 
     /**
      * Инициализация активности
@@ -319,13 +323,12 @@ class MainActivity : AppCompatActivity() {
                         initialPosition = 2
                     }
 
-
                     // Установка позиции только если она отличается от текущей
-                    if (currentUSBPosition != initialPosition) {
-                        isProgrammaticChange = true
+                    if (currentUSBPosition.get() != initialPosition) {
+                        isProgrammaticChange.set(true)
                         usbModeSwitcher.setPosition(initialPosition, false)
-                        isProgrammaticChange = false
-                        currentUSBPosition = initialPosition
+                        isProgrammaticChange.set(false)
+                        currentUSBPosition.set(initialPosition)
                     }
                 }
             } catch (e: Exception) {
@@ -333,11 +336,11 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     UIHelper.showCustomToast(this@MainActivity, "Failed to read USB mode")
 
-                    if (currentUSBPosition != 0) {
-                        isProgrammaticChange = true
+                    if (currentUSBPosition.get() != 0) {
+                        isProgrammaticChange.set(true)
                         usbModeSwitcher.setPosition(0, false)
-                        isProgrammaticChange = false
-                        currentUSBPosition = 0
+                        isProgrammaticChange.set(false)
+                        currentUSBPosition.set(0)
                     }
                 }
             }
@@ -345,12 +348,12 @@ class MainActivity : AppCompatActivity() {
 
         usbModeSwitcher.onPositionChangedListener =
             SegmentedButtonGroup.OnPositionChangedListener { position ->
-                if (isProgrammaticChange) {
+                if (isProgrammaticChange.get()) {
                     Log.i(TAG, "Ignoring programmatic position change")
                     return@OnPositionChangedListener // Игнорируем вызов
                 }
 
-                if (position == currentUSBPosition) {
+                if (position == currentUSBPosition.get()) {
                     Log.i(TAG, "Position unchanged. No action needed.")
                     return@OnPositionChangedListener // Если позиция не изменилась, ничего не делаем
                 }
@@ -371,16 +374,16 @@ class MainActivity : AppCompatActivity() {
                                 prefs.edit().putBoolean("auto_usb_peripheral", false).apply()
                             }
 
-                            currentUSBPosition = position
+                            currentUSBPosition.set(position)
                             UIHelper.showCustomToast(this@MainActivity, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}")
                             Log.i(TAG, "USB Mode successfully set to $newMode")
                         } else {
                             UIHelper.showCustomToast(this@MainActivity, "Failed to set USB Mode")
                             Log.e(TAG, "Failed to set USB Mode to $newMode")
 
-                            isProgrammaticChange = true
-                            usbModeSwitcher.setPosition(currentUSBPosition, true) // Возвращаем в исходную позицию
-                            isProgrammaticChange = false
+                            isProgrammaticChange.set(true)
+                            usbModeSwitcher.setPosition(currentUSBPosition.get(), true) // Возвращаем в исходную позицию
+                            isProgrammaticChange.set(false)
                         }
                     }
                 }
