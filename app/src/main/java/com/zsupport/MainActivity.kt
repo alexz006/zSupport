@@ -188,6 +188,7 @@ class MainActivity : AppCompatActivity() {
         val timezoneAutoComplete = findViewById<AutoCompleteTextView>(R.id.timezoneAutoComplete)
         timezoneAutoComplete.setAdapter(adapter)
         timezoneAutoComplete.threshold = 1 // Поиск начинается после ввода первого символа
+        timezoneAutoComplete.hint = getString(R.string.select_timezone_hint)
 
         // Загружаем сохраненный часовой пояс, если он существует
         val savedTimeZone = getTimeZoneFromPrefs()
@@ -220,7 +221,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 Log.e(TAG, "Selected timezone not found in available IDs.")
-                UIHelper.showCustomToast(this@MainActivity, "Invalid timezone selected")
+                UIHelper.showCustomToast(this@MainActivity, getString(R.string.invalid_timezone_selected))
             }
         }
 
@@ -257,10 +258,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.clearAppCache(this, selectedPackage)
-                UIHelper.showCustomToast(this@MainActivity, "Cache cleared for $selectedAppName")
+                UIHelper.showCustomToast(this@MainActivity, getString(R.string.cache_cleared_for, selectedAppName))
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                UIHelper.showCustomToast(this@MainActivity, "Please select a valid app")
+                UIHelper.showCustomToast(this@MainActivity, getString(R.string.select_valid_app))
             }
         }
 
@@ -270,10 +271,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.clearAppData(this, selectedPackage)
-                UIHelper.showCustomToast(this@MainActivity, "Data cleared for $selectedAppName")
+                UIHelper.showCustomToast(this@MainActivity, getString(R.string.data_cleared_for, selectedAppName))
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                UIHelper.showCustomToast(this@MainActivity, "Please select a valid app")
+                UIHelper.showCustomToast(this@MainActivity, getString(R.string.select_valid_app))
             }
         }
 
@@ -283,10 +284,10 @@ class MainActivity : AppCompatActivity() {
 
             if (selectedPackage != null) {
                 AppHelper.forceStopApp(this, selectedPackage)
-                UIHelper.showCustomToast(this@MainActivity, "App stopped: $selectedAppName")
+                UIHelper.showCustomToast(this@MainActivity, getString(R.string.app_stopped, selectedAppName))
             } else {
                 Log.e(TAG, "App not found: $selectedAppName")
-                UIHelper.showCustomToast(this@MainActivity, "Please select a valid app")
+                UIHelper.showCustomToast(this@MainActivity, getString(R.string.select_valid_app))
             }
         }
 
@@ -334,7 +335,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e(TAG, "Error reading USB mode", e)
                 withContext(Dispatchers.Main) {
-                    UIHelper.showCustomToast(this@MainActivity, "Failed to read USB mode")
+                    UIHelper.showCustomToast(this@MainActivity, getString(R.string.failed_read_usb_mode))
 
                     if (currentUSBPosition.get() != 0) {
                         isProgrammaticChange.set(true)
@@ -375,10 +376,10 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             currentUSBPosition.set(position)
-                            UIHelper.showCustomToast(this@MainActivity, "USB Mode set to ${usbHelper.formatUsbMode(newMode)}")
+                            UIHelper.showCustomToast(this@MainActivity, getString(R.string.usb_mode_set_to, usbHelper.formatUsbMode(newMode)))
                             Log.i(TAG, "USB Mode successfully set to $newMode")
                         } else {
-                            UIHelper.showCustomToast(this@MainActivity, "Failed to set USB Mode")
+                            UIHelper.showCustomToast(this@MainActivity, getString(R.string.failed_set_usb_mode))
                             Log.e(TAG, "Failed to set USB Mode to $newMode")
 
                             isProgrammaticChange.set(true)
@@ -404,7 +405,7 @@ class MainActivity : AppCompatActivity() {
         appNamesToPackages.forEach { (appName, packageName) ->
             if (installedApps.contains(packageName)) {
                 permissionsHelper.applyPermissions(this, packageName)
-                statusBuilder.append("$appName: найден. Права: выданы.\n")
+                statusBuilder.append(getString(R.string.app_found_rights_granted, appName) + "\n")
                 Log.i(TAG, "$appName ($packageName) найден. Права выданы.")
             } else {
                 //statusBuilder.append("$appName: не найден.\n")

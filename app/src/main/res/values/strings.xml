@@ -3,4 +3,30 @@
     <string name="boxAgreement">By managing system settings from this application, you confirm that you are fully aware of your actions and the potential consequences they may lead to. Any changes made directly to the system parameters of the vehicle may result in malfunctions, lockouts, or the complete inoperability of certain software or the vehicle itself, lack of updates, data desynchronization, and more. By clicking any buttons in this application, you acknowledge that you fully understand the above and accept full responsibility for your actions and their potential consequences.</string>
     <string name="imAgreedText">I Agree</string>
     <string name="keyboard_icon">Keyboard selection dialog</string>
+    
+    <!-- Toast сообщения для пользователя -->
+    <string name="invalid_timezone_selected">Invalid timezone selected</string>
+    <string name="cache_cleared_for">Cache cleared for %1$s</string>
+    <string name="data_cleared_for">Data cleared for %1$s</string>
+    <string name="app_stopped">App stopped: %1$s</string>
+    <string name="select_valid_app">Please select a valid app</string>
+    <string name="failed_read_usb_mode">Failed to read USB mode</string>
+    <string name="usb_mode_set_to">USB Mode set to %1$s</string>
+    <string name="failed_set_usb_mode">Failed to set USB Mode</string>
+    <string name="keyboard_activated">%1$s activated</string>
+    <string name="keyboard_not_installed">%1$s not installed</string>
+    
+    <!-- Диалоговые сообщения -->
+    <string name="reboot_device_title">Reboot Device</string>
+    <string name="reboot_device_message">Are you sure you want to reboot your device?</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="current_input_method">Current Input Method: %1$s</string>
+    
+    <!-- Метки интерфейса -->
+    <string name="select_timezone_hint">Select Timezone</string>
+    <string name="temporary_change">Temporary Change</string>
+    <string name="permanent_change">Permanent Change</string>
+    <string name="app_found_rights_granted">%1$s: найден. Права: выданы.</string>
 </resources>

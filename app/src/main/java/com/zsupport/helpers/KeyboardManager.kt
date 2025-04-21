@@ -154,9 +154,9 @@ class KeyboardManager private constructor() {
             if (isKeyboardInstalled(context, inputMethod)) {
                 enableKeyboard(context, inputMethod)
                 selectKeyboard(context, inputMethod)
-                UIHelper.showCustomToast(context, "$keyboardName activated")
+                com.zsupport.helpers.UIHelper.showCustomToast(context, context.getString(R.string.keyboard_activated, keyboardName))
             } else {
-                UIHelper.showCustomToast(context, "$keyboardName not installed")
+                com.zsupport.helpers.UIHelper.showCustomToast(context, context.getString(R.string.keyboard_not_installed, keyboardName))
             }
         } else {
             Log.e(TAG, "Unsupported keyboard: $keyboardName")
@@ -187,7 +187,7 @@ class KeyboardManager private constructor() {
         fun updateUI() {
             val currentKeyboard = getCurrentKeyboard(context)
             val currentKeyboardName = supportedKeyboards.entries.find { it.value == currentKeyboard }?.key ?: "Unknown"
-            currentInputMethodTextView.text = "Current Input Method: $currentKeyboardName"
+            currentInputMethodTextView.text = context.getString(R.string.current_input_method, currentKeyboardName)
 
             val buttons = mapOf(
                 "Gboard" to gboardButton,
@@ -224,7 +224,7 @@ class KeyboardManager private constructor() {
         }
 
         dialogBuilder.setView(dialogView)
-        dialogBuilder.setNegativeButton("Close", null)
+        dialogBuilder.setNegativeButton(context.getString(R.string.close), null)
 
         val dialog = dialogBuilder.create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

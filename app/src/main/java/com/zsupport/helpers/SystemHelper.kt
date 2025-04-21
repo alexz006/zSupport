@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import android.util.Log
+import com.zsupport.R
 
 /**
  * SystemHelper - вспомогательный класс для выполнения системных операций,
@@ -21,12 +22,12 @@ object SystemHelper {
      */
     fun showRebootDialog(context: Context) {
         AlertDialog.Builder(context)
-            .setTitle("Reboot Device")
-            .setMessage("Are you sure you want to reboot your device?")
-            .setPositiveButton("Yes") { _, _ ->
+            .setTitle(context.getString(R.string.reboot_device_title))
+            .setMessage(context.getString(R.string.reboot_device_message))
+            .setPositiveButton(context.getString(R.string.yes)) { _, _ ->
                 initiateReboot(context)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(context.getString(R.string.cancel), null)
             .show()
     }
 
