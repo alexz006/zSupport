@@ -27,7 +27,7 @@ zSupport - Android-приложение для управления систем
 
 Для установки приложения необходимо:
 
-1. Загрузить последнюю версию APK из раздела [Releases](https://github.com/CarWizard/zSupport/releases)
+1. Загрузить последнюю версию APK [Releases](https://github.com/alexz006/zSupport/blob/main/app/release/zSupport-1.3.3-release.apk)
 2. Установить приложение с системными правами (требуется рут-доступ или установка через инженерное меню)
 
 ## Архитектура приложения
