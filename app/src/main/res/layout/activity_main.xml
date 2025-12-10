@@ -6,300 +6,433 @@
     android:layout_height="match_parent"
     android:background="?attr/mainBackground">
 
-    <!-- Основной контент с новым блоком -->
+    <!-- Блок предупреждения + I Agree, показывается при старте -->
     <LinearLayout
+        android:id="@+id/agreementLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:padding="@dimen/mainLayoutPadding">
 
-        <!-- Основной контент -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
-
-            <!-- Основной текст -->
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="@dimen/boxAgreementTextWidth"
-                android:layout_height="wrap_content"
-                android:text="@string/boxAgreement"
-                android:textSize="@dimen/boxAgreementTextSize"
-                android:layout_marginBottom="@dimen/mainLayoutTopMargin"
-                android:layout_gravity="center_horizontal"
-                android:textColor="?attr/mainText"
-                android:justificationMode="inter_word" />
-
-            <!-- Чекбокс с текстом "Я согласен" -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/mainLayoutTopMargin">
-
-                <CheckBox
-                    android:id="@+id/checkBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleX="1.5"
-                    android:scaleY="1.5"
-                    android:layout_marginEnd="@dimen/mainLayoutTopMargin" />
-
-                <TextView
-                    android:id="@+id/agreementText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/imAgreedText"
-                    android:textSize="@dimen/boxAgreementTextSize"
-                    android:textColor="?attr/mainText"
-                    android:justificationMode="inter_word" />
-            </LinearLayout>
-
-            <!-- Разделение экрана на две половины -->
-            <LinearLayout
-                android:layout_width="@dimen/boxAgreementTextWidth"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="@dimen/mainLayoutTopMargin">
-
-                <!-- Левая половина с кнопками переключения языка -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal">
-
-                    <Button
-                        android:id="@+id/chineseButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="CHINESE"
-                        style="@style/CustomOFFButtonStyle"
-                        android:layout_marginBottom="@dimen/mainSmallMargin" />
-
-                    <Button
-                        android:id="@+id/englishButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="ENGLISH"
-                        style="@style/CustomOFFButtonStyle" />
-
-                    <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
-                        android:id="@+id/usbModeSwitcher"
-                        android:layout_width="@dimen/usbSwitcherWidth"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/mainLayoutPadding"
-                        android:weightSum="3"
-                        app:draggable="true"
-                        app:selectedBackground="@color/buttonBarSelectedColor"
-                        app:borderWidth="1dp"
-                        app:borderColor="@color/buttonBarBorderColor"
-                        app:radius="@dimen/buttonsCornerRadius"
-                        app:ripple="true"
-                        app:rippleColor="@color/buttonBarRippleColor"
-                        >
-
-                        <com.addisonelliott.segmentedbutton.SegmentedButton
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:padding="@dimen/buttonsMainPadding"
-                            app:textColor="@color/buttonBarTextColor"
-                            app:selectedTextColor="@color/white"
-                            app:text="Peripheral"
-                            app:textSize="@dimen/boxAgreementTextSize"
-                            app:drawable="@drawable/baseline_usb_54"
-                            app:drawableTint="@color/buttonBarTextColor"
-                            app:selectedDrawableTint="@color/white"
-                            app:drawableGravity="top"
-                            app:drawablePadding="4dp"
-                            />
-
-                        <com.addisonelliott.segmentedbutton.SegmentedButton
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:padding="@dimen/buttonsMainPadding"
-                            app:textColor="@color/buttonBarTextColor"
-                            app:selectedTextColor="@color/white"
-                            app:text="Host"
-                            app:textSize="@dimen/boxAgreementTextSize"
-                            app:drawable="@drawable/baseline_usb_off_54"
-                            app:drawableTint="@color/buttonBarTextColor"
-                            app:selectedDrawableTint="@color/white"
-                            app:drawableGravity="top"
-                            app:drawablePadding="4dp"
-                            />
-
-                        <com.addisonelliott.segmentedbutton.SegmentedButton
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:padding="@dimen/buttonsMainPadding"
-                            app:textColor="@color/buttonBarTextColor"
-                            app:selectedTextColor="@color/white"
-                            app:text="AUTO"
-                            app:textSize="@dimen/boxAgreementTextSize"
-                            app:drawable="@drawable/baseline_autorenew_54"
-                            app:drawableTint="@color/buttonBarTextColor"
-                            app:selectedDrawableTint="@color/white"
-                            app:drawableGravity="top"
-                            app:drawablePadding="4dp"
-                            />
-
-                    </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
-                </LinearLayout>
-
-                <!-- Правая половина с Spinner и кнопкой изменения времени -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Select Timezone"
-                        android:padding="@dimen/selectTimeZonePadding"
-                        android:layout_marginTop="@dimen/mainLayoutTopMargin">
-
-                        <AutoCompleteTextView
-                            android:id="@+id/timezoneAutoComplete"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="@dimen/boxAgreementTextSize"
-                            android:padding="@dimen/selectTimeZonePadding"
-                            android:imeOptions="flagNoFullscreen"
-                            android:inputType="textNoSuggestions"
-                            android:background="@drawable/custom_spinner_background" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <RadioGroup
-                        android:id="@+id/radioGroupTimezone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="@dimen/mainLayoutMargin"
-                        android:layout_marginBottom="@dimen/mainSmallMargin">
-
-                        <RadioButton
-                            android:id="@+id/radioTemporary"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Temporary Change"
-                            android:textSize="@dimen/boxAgreementTextSize"
-                            android:checked="true" />
-
-                        <RadioButton
-                            android:id="@+id/radioPermanent"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Permanent Change"
-                            android:layout_marginTop="@dimen/mainLayoutMargin"
-                            android:textSize="@dimen/boxAgreementTextSize" />
-                    </RadioGroup>
-
-                    <CheckBox
-                        android:id="@+id/autoDetectTimezoneCheckbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Disable Auto Timezone"
-                        android:layout_marginTop="@dimen/mainLayoutMargin"
-                        android:textSize="@dimen/boxAgreementTextSize"
-                        android:layout_marginBottom="@dimen/mainSmallMargin" />
-
-                    <Button
-                        android:id="@+id/timezoneButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Set Timezone"
-                        style="@style/CustomOFFButtonStyle"
-                        android:layout_marginTop="@dimen/mainLayoutMargin" />
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Новый блок для управления приложениями -->
-        <LinearLayout
+        <!-- Основной текст с предупреждением -->
+        <TextView
+            android:id="@+id/textView"
+            android:layout_marginTop="100dp"
             android:layout_width="@dimen/boxAgreementTextWidth"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="@dimen/mainLayoutMargin">
+            android:text="@string/boxAgreement"
+            android:textSize="@dimen/boxAgreementTextSize"
+            android:layout_marginBottom="@dimen/mainLayoutTopMargin"
+            android:layout_gravity="center_horizontal"
+            android:textColor="?attr/mainText"
+            android:justificationMode="inter_word" />
 
-            <!-- Spinner для выбора приложения -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+        <!-- Чекбокс "I agree" -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/mainLayoutTopMargin">
+
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Select App"
-                android:padding="@dimen/selectTimeZonePadding"
-                android:layout_marginBottom="@dimen/mainLayoutMargin">
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                android:layout_marginEnd="@dimen/mainLayoutTopMargin" />
 
-                <AutoCompleteTextView
-                    android:id="@+id/appSelector"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/boxAgreementTextSize"
-                    android:padding="@dimen/selectTimeZonePadding"
-                    android:imeOptions="flagNoFullscreen"
-                    android:inputType="textNoSuggestions"
-                    android:background="@drawable/custom_spinner_background" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Кнопки для управления приложениями -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/agreementText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="@dimen/mainLayoutMargin">
-
-                <Button
-                    android:id="@+id/clearCacheButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Clear Cache"
-                    android:layout_marginEnd="@dimen/mainLayoutMargin"
-                    style="@style/CustomOFFButtonStyle" />
-
-                <Button
-                    android:id="@+id/clearDataButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Clear Data"
-                    android:layout_marginEnd="@dimen/mainLayoutMargin"
-                    style="@style/CustomOFFButtonStyle" />
-
-                <Button
-                    android:id="@+id/forceStopButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Force Stop"
-                    style="@style/CustomOFFButtonStyle" />
-            </LinearLayout>
+                android:text="@string/imAgreedText"
+                android:textSize="@dimen/boxAgreementTextSize"
+                android:textColor="?attr/mainText"
+                android:justificationMode="inter_word" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Текст для отображения статуса приложений -->
-    <TextView
-        android:id="@+id/statusTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
-        android:textColor="?attr/mainText"
-        android:textSize="14sp"
-        android:text="" />
+    <!-- Основное содержимое (меню + контент), по умолчанию скрыто -->
+    <LinearLayout
+        android:id="@+id/mainContentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="@dimen/mainLayoutPadding"
+        android:visibility="gone">
 
+        <!-- ЛЕВОЕ МЕНЮ -->
+        <LinearLayout
+            android:id="@+id/menuLayout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="top"
+            android:paddingEnd="@dimen/mainLayoutPadding">
+
+            <Button
+                android:id="@+id/menuLocaleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Locale"
+                style="@style/CustomOFFButtonStyle"
+                android:layout_marginBottom="@dimen/mainSmallMargin" />
+
+            <Button
+                android:id="@+id/menuUsbButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="USB mode"
+                style="@style/CustomOFFButtonStyle"
+                android:layout_marginBottom="@dimen/mainSmallMargin" />
+
+            <Button
+                android:id="@+id/menuTimezoneButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Timezone"
+                style="@style/CustomOFFButtonStyle"
+                android:layout_marginBottom="@dimen/mainSmallMargin" />
+
+            <Button
+                android:id="@+id/menuAppsButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Apps"
+                style="@style/CustomOFFButtonStyle"
+                android:layout_marginBottom="@dimen/mainSmallMargin" />
+
+            <Button
+                android:id="@+id/menuKeyboardButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Keyboard"
+                style="@style/CustomOFFButtonStyle"
+                android:layout_marginBottom="@dimen/mainSmallMargin" />
+
+            <Button
+                android:id="@+id/menuOtherButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Other"
+                style="@style/CustomOFFButtonStyle" />
+
+        </LinearLayout>
+
+        <!-- ПРАВЫЙ КОНТЕНТ -->
+        <FrameLayout
+            android:id="@+id/contentContainer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3">
+
+            <!-- Секция: Локаль -->
+            <LinearLayout
+                android:id="@+id/sectionLocale"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/chineseButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CHINESE"
+                    style="@style/CustomOFFButtonStyle"
+                    android:layout_marginBottom="@dimen/mainSmallMargin" />
+
+                <Button
+                    android:id="@+id/englishButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ENGLISH"
+                    style="@style/CustomOFFButtonStyle" />
+            </LinearLayout>
+
+            <!-- Секция: USB режим -->
+            <LinearLayout
+                android:id="@+id/sectionUsb"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:visibility="gone">
+
+                <com.addisonelliott.segmentedbutton.SegmentedButtonGroup
+                    android:id="@+id/usbModeSwitcher"
+                    android:layout_width="@dimen/usbSwitcherWidth"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/mainLayoutPadding"
+                    android:weightSum="3"
+                    app:draggable="true"
+                    app:selectedBackground="@color/buttonBarSelectedColor"
+                    app:borderWidth="1dp"
+                    app:borderColor="@color/buttonBarBorderColor"
+                    app:radius="@dimen/buttonsCornerRadius"
+                    app:ripple="true"
+                    app:rippleColor="@color/buttonBarRippleColor">
+
+                    <com.addisonelliott.segmentedbutton.SegmentedButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/buttonsMainPadding"
+                        app:textColor="@color/buttonBarTextColor"
+                        app:selectedTextColor="@color/white"
+                        app:text="Peripheral"
+                        app:textSize="@dimen/boxAgreementTextSize"
+                        app:drawable="@drawable/baseline_usb_54"
+                        app:drawableTint="@color/buttonBarTextColor"
+                        app:selectedDrawableTint="@color/white"
+                        app:drawableGravity="top"
+                        app:drawablePadding="4dp" />
+
+                    <com.addisonelliott.segmentedbutton.SegmentedButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/buttonsMainPadding"
+                        app:textColor="@color/buttonBarTextColor"
+                        app:selectedTextColor="@color/white"
+                        app:text="Host"
+                        app:textSize="@dimen/boxAgreementTextSize"
+                        app:drawable="@drawable/baseline_usb_off_54"
+                        app:drawableTint="@color/buttonBarTextColor"
+                        app:selectedDrawableTint="@color/white"
+                        app:drawableGravity="top"
+                        app:drawablePadding="4dp" />
+
+                    <com.addisonelliott.segmentedbutton.SegmentedButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="@dimen/buttonsMainPadding"
+                        app:textColor="@color/buttonBarTextColor"
+                        app:selectedTextColor="@color/white"
+                        app:text="AUTO"
+                        app:textSize="@dimen/boxAgreementTextSize"
+                        app:drawable="@drawable/baseline_autorenew_54"
+                        app:drawableTint="@color/buttonBarTextColor"
+                        app:selectedDrawableTint="@color/white"
+                        app:drawableGravity="top"
+                        app:drawablePadding="4dp" />
+
+                </com.addisonelliott.segmentedbutton.SegmentedButtonGroup>
+            </LinearLayout>
+
+            <!-- Секция: Таймзона -->
+            <LinearLayout
+                android:id="@+id/sectionTimezone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="@dimen/boxAgreementTextWidth"
+                    android:layout_height="wrap_content"
+                    android:hint="Select Timezone"
+                    android:padding="@dimen/selectTimeZonePadding"
+                    android:layout_marginTop="@dimen/mainLayoutTopMargin">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/timezoneAutoComplete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/boxAgreementTextSize"
+                        android:padding="@dimen/selectTimeZonePadding"
+                        android:imeOptions="flagNoFullscreen"
+                        android:inputType="textNoSuggestions"
+                        android:background="@drawable/custom_spinner_background" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <CheckBox
+                    android:id="@+id/autoDetectTimezoneCheckbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Disable Auto Timezone"
+                    android:layout_marginTop="@dimen/mainLayoutMargin"
+                    android:textSize="@dimen/boxAgreementTextSize"
+                    android:layout_marginBottom="@dimen/mainSmallMargin" />
+
+                <Button
+                    android:id="@+id/timezoneButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set Timezone"
+                    style="@style/CustomOFFButtonStyle"
+                    android:layout_marginTop="@dimen/mainLayoutMargin" />
+            </LinearLayout>
+
+            <!-- Секция: Приложения -->
+            <LinearLayout
+                android:id="@+id/sectionApps"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="@dimen/boxAgreementTextWidth"
+                    android:layout_height="wrap_content"
+                    android:hint="Select App"
+                    android:padding="@dimen/selectTimeZonePadding"
+                    android:layout_marginBottom="@dimen/mainLayoutMargin">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/appSelector"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/boxAgreementTextSize"
+                        android:padding="@dimen/selectTimeZonePadding"
+                        android:imeOptions="flagNoFullscreen"
+                        android:inputType="textNoSuggestions"
+                        android:background="@drawable/custom_spinner_background" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="@dimen/boxAgreementTextWidth"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/mainLayoutMargin">
+
+                    <Button
+                        android:id="@+id/clearCacheButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Clear Cache"
+                        android:layout_marginEnd="@dimen/mainLayoutMargin"
+                        style="@style/CustomOFFButtonStyle" />
+
+                    <Button
+                        android:id="@+id/clearDataButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Clear Data"
+                        android:layout_marginEnd="@dimen/mainLayoutMargin"
+                        style="@style/CustomOFFButtonStyle" />
+
+                    <Button
+                        android:id="@+id/forceStopButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Force Stop"
+                        style="@style/CustomOFFButtonStyle" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Секция: Клавиатура -->
+            <LinearLayout
+                android:id="@+id/sectionKeyboard"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:visibility="gone"
+                android:padding="@dimen/mainLayoutPadding">
+
+                <!-- Текущий метод ввода -->
+                <TextView
+                    android:id="@+id/currentInputMethodTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/current_input_method_unknown"
+                    android:textSize="@dimen/keyBoardHeaderTextSize"
+                    android:textColor="?attr/mainText"
+                    android:layout_marginBottom="@dimen/keyBoardHeaderMarginBottom" />
+
+                <!-- Кнопки выбора клавиатуры -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="@dimen/mainLayoutMargin">
+
+                    <!-- Gboard -->
+                    <Button
+                        android:id="@+id/gboardButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Gboard"
+                        android:layout_margin="8dp"
+                        android:layout_gravity="center"
+                        style="@style/CustomButtonStyle" />
+
+                    <!-- Yandex Keyboard -->
+                    <Button
+                        android:id="@+id/yandexButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Yandex Keyboard"
+                        android:layout_margin="8dp"
+                        android:layout_gravity="center"
+                        style="@style/CustomButtonStyle" />
+
+                    <!-- Microsoft Swift -->
+                    <Button
+                        android:id="@+id/msswiftButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Microsoft Swift"
+                        android:layout_margin="8dp"
+                        android:layout_gravity="center"
+                        style="@style/CustomButtonStyle" />
+                </LinearLayout>
+
+                <!-- Тестовое поле ввода для проверки клавиатуры -->
+                <EditText
+                    android:id="@+id/testInputEditText"
+                    android:layout_width="@dimen/boxAgreementTextWidth"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/keyboard_test_hint"
+                    android:textSize="@dimen/boxAgreementTextSize"
+                    android:padding="@dimen/selectTimeZonePadding"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:imeOptions="flagNoFullscreen"
+                    android:inputType="text"
+                    android:background="@drawable/custom_spinner_background" />
+
+            </LinearLayout>
+
+            <!-- Секция: Другое -->
+            <ScrollView
+                android:id="@+id/sectionOther"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mainLayoutPadding">
+
+                    <TextView
+                        android:id="@+id/statusTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/mainText"
+                        android:textSize="14sp"
+                        android:text="" />
+                </LinearLayout>
+            </ScrollView>
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Версия приложения + OS Zeekr (обновляется в коде) -->
     <TextView
         android:id="@+id/versionTextView"
         android:layout_width="wrap_content"
@@ -309,17 +442,5 @@
         android:textColor="?attr/mainText"
         android:textSize="@dimen/boxAgreementTextSize"
         android:text="" />
-
-    <ImageButton
-        android:id="@+id/keyboardButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:background="?attr/selectableItemBackground"
-        android:src="@drawable/ic_keyboard_54"
-        android:contentDescription="@string/keyboard_icon"
-        app:tint="?attr/mainText" />
-
 
 </FrameLayout>
