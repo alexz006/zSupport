@@ -2,9 +2,10 @@ package com.zsupport.helpers
 
 import android.app.backup.BackupManager
 import android.content.Context
-import android.content.SharedPreferences
+import android.content.Intent
 import android.provider.Settings
 import android.util.Log
+import android.os.SystemClock
 import java.util.TimeZone
 
 /**
@@ -19,48 +20,113 @@ class TimeZoneHelper {
     private val TIMEZONE_KEY = "selected_time_zone"
 
     /**
-     * Преобразует идентификатор часового пояса в человекочитаемый формат
-     *
-     * @param timeZoneId Идентификатор часового пояса
-     * @return Строка с названием города и смещением GMT
+     * Читает текущую системную таймзону с учётом persist.sys.timezone.
      */
-    fun getReadableTimeZone(timeZoneId: String): String {
-        val timeZone = TimeZone.getTimeZone(timeZoneId)
-        val offset = timeZone.rawOffset / (60 * 60 * 1000) // Смещение в часах
-        val offsetMinutes = Math.abs(timeZone.rawOffset / (60 * 1000) % 60) // Минуты для неполных часов
-        val offsetSign = if (offset >= 0) "+" else "-"
-        val gmtOffset = if (offsetMinutes > 0) {
-            "GMT$offsetSign${Math.abs(offset)}:${String.format("%02d", offsetMinutes)}"
-        } else {
-            "GMT$offsetSign${Math.abs(offset)}"
+    fun getCurrentSystemTimeZoneId(context: Context): String {
+        // 1) пробуем persist.sys.timezone
+        try {
+            val spClass = Class.forName("android.os.SystemProperties")
+            val getMethod = spClass.getDeclaredMethod("get", String::class.java, String::class.java)
+            getMethod.isAccessible = true
+            val propTz = getMethod.invoke(null, "persist.sys.timezone", "") as String
+            if (!propTz.isNullOrEmpty()) {
+                Log.i(TAG, "Current timezone from persist.sys.timezone: $propTz")
+                return propTz
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to read persist.sys.timezone: ${e.message}", e)
         }
 
-        val cityName = timeZoneId.substringAfterLast('/') // Получаем название города/области
-            .replace('_', ' ') // Преобразуем подчеркивания в пробелы
+        // 2) пробуем Settings.Global.time_zone
+        try {
+            val globalTz = Settings.Global.getString(context.contentResolver, "time_zone")
+            if (!globalTz.isNullOrEmpty()) {
+                Log.i(TAG, "Current timezone from Settings.Global.time_zone: $globalTz")
+                return globalTz
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to read Settings.Global.time_zone: ${e.message}", e)
+        }
 
-        return "$cityName ($gmtOffset)"
+        // 3) дефолт Java
+        val def = TimeZone.getDefault().id
+        Log.i(TAG, "Using TimeZone.getDefault(): $def")
+        return def
     }
 
     /**
-     * Временно изменяет системный часовой пояс
+     * Устанавливает persist.sys.timezone через SystemProperties.set()
+     * (аналог adb shell setprop persist.sys.timezone <tz>).
+     */
+    private fun setPersistSysTimezone(timeZoneId: String): Boolean {
+        return try {
+            val spClass = Class.forName("android.os.SystemProperties")
+            val setMethod = spClass.getDeclaredMethod("set", String::class.java, String::class.java)
+            setMethod.isAccessible = true
+            setMethod.invoke(null, "persist.sys.timezone", timeZoneId)
+            Log.i(TAG, "persist.sys.timezone set to $timeZoneId")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to set persist.sys.timezone: ${e.message}", e)
+            false
+        }
+    }
+
+    /**
+     * Шлёт broadcast, аналогичный:
+     * adb shell am broadcast -a android.intent.action.TIMEZONE_CHANGED --es time-zone <tz>
+     */
+    private fun sendTimeZoneChangedBroadcast(context: Context, timeZoneId: String) {
+        try {
+            val intent = Intent(Intent.ACTION_TIMEZONE_CHANGED)
+            intent.putExtra("time-zone", timeZoneId)
+            context.sendBroadcast(intent)
+            Log.i(TAG, "Sent ACTION_TIMEZONE_CHANGED with time-zone=$timeZoneId")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to send ACTION_TIMEZONE_CHANGED: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Временно изменяет системный часовой пояс.
      *
-     * @param context Контекст приложения
-     * @param timeZoneId Идентификатор часового пояса
-     * @return true если операция выполнена успешно, false в противном случае
+     * ЛОГИКА:
+     * 1) Сохраняем текущее UTC-время (System.currentTimeMillis()).
+     * 2) Делаем setprop + broadcast.
+     * 3) Возвращаем SystemClock к сохранённому UTC.
+     *
+     * Таким образом, текущий момент остаётся тем же,
+     * меняется только интерпретация времени в новой зоне.
      */
     fun changeSystemTimeZone(context: Context, timeZoneId: String): Boolean {
-        Log.i(TAG, "Changing system timezone to $timeZoneId")
+        Log.i(TAG, "Changing system timezone TEMPORARY to $timeZoneId")
+
+        // Сохраняем «как есть» текущее UTC до любых изменений
+        val beforeUtc = System.currentTimeMillis()
+        Log.i(TAG, "UTC before timezone change: $beforeUtc")
 
         return try {
-            val alarmManagerClass = Class.forName("android.app.AlarmManager")
-            val setTimeZoneMethod = alarmManagerClass.getDeclaredMethod("setTimeZone", String::class.java)
+            // 1) setprop persist.sys.timezone
+            val propOk = setPersistSysTimezone(timeZoneId)
 
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE)
-            setTimeZoneMethod.invoke(alarmManager, timeZoneId)
+            // 2) шлём broadcast
+            sendTimeZoneChangedBroadcast(context, timeZoneId)
 
+            // 3) уведомляем систему о смене настроек
             BackupManager.dataChanged("com.android.providers.settings")
-            Log.i(TAG, "System timezone updated successfully to $timeZoneId")
-            true
+
+            // 4) ВОЗВРАЩАЕМ обратно UTC — чтобы система не «накручивала» часы.
+            try {
+                val ok = SystemClock.setCurrentTimeMillis(beforeUtc)
+                Log.i(TAG, "SystemClock.setCurrentTimeMillis(back to $beforeUtc) = $ok")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to restore UTC after timezone change: ${e.message}", e)
+            }
+
+            val finalTz = getCurrentSystemTimeZoneId(context)
+            Log.i(TAG, "System timezone after TEMP change: $finalTz")
+
+            propOk
         } catch (e: Exception) {
             Log.e(TAG, "Failed to change timezone: ${e.message}", e)
             false
@@ -68,64 +134,56 @@ class TimeZoneHelper {
     }
 
     /**
-     * Устанавливает системный часовой пояс постоянно
+     * Устанавливает системный часовой пояс постоянно.
      *
-     * @param context Контекст приложения
-     * @param timeZoneId Идентификатор часового пояса
-     * @return true если операция выполнена успешно, false в противном случае
+     * ЛОГИКА:
+     * 1) Отключаем авто-таймзону.
+     * 2) Сохраняем выбранный ID в Settings.Global (для совместимости) и префы.
+     * 3) Вызываем changeSystemTimeZone() — он уже делает setprop + broadcast + фиксацию времени.
      */
     fun setSystemTimeZonePermanent(context: Context, timeZoneId: String): Boolean {
-        Log.i(TAG, "Setting permanent system timezone to $timeZoneId")
-        
-        // Шаг 1: Отключаем автоматическое определение часового пояса
+        Log.i(TAG, "Setting PERMANENT system timezone to $timeZoneId")
+
+        // 1) отключаем автоматическое определение
         setAutoTimeZoneEnabled(context, false)
-        
-        try {
-            // Шаг 2: Устанавливаем часовой пояс напрямую через Settings.Global
-            Settings.Global.putString(context.contentResolver, "time_zone", timeZoneId)
-            
-            // Шаг 3: Также используем метод через рефлексию для совместимости со старыми устройствами
+
+        return try {
+            // 2) сохраняем в Settings.Global для «официальной» настройки
             try {
-                val settingsGlobalClass = Class.forName("android.provider.Settings\$Global")
-                val putStringMethod = settingsGlobalClass.getDeclaredMethod(
-                    "putString",
-                    android.content.ContentResolver::class.java,
-                    String::class.java,
-                    String::class.java
-                )
-                putStringMethod.invoke(null, context.contentResolver, "time_zone", timeZoneId)
+                Settings.Global.putString(context.contentResolver, "time_zone", timeZoneId)
+                Log.i(TAG, "Settings.Global.time_zone set to $timeZoneId")
             } catch (e: Exception) {
-                Log.w(TAG, "Using reflection method failed, continuing with direct method: ${e.message}")
+                Log.w(TAG, "Failed to set Settings.Global.time_zone: ${e.message}")
             }
 
-            // Шаг 4: Активируем изменения через AlarmManager
+            // 3) сам переход зоны + фиксация времени
             val success = changeSystemTimeZone(context, timeZoneId)
-            
-            // Шаг 5: Проверяем, что установка произошла корректно
-            val currentTimeZone = Settings.Global.getString(context.contentResolver, "time_zone")
-            Log.i(TAG, "Current timezone setting after change: $currentTimeZone")
-            
-            // Шаг 6: Уведомляем систему об изменении настроек
-            BackupManager.dataChanged("com.android.providers.settings")
-            
-            Log.i(TAG, "System timezone set permanently to $timeZoneId")
-            return true
+
+            if (success) {
+                // Сохраняем в префы выбранный ID
+                saveTimeZoneToPrefs(context, timeZoneId)
+            }
+
+            val currentTimeZone = getCurrentSystemTimeZoneId(context)
+            Log.i(TAG, "System timezone after PERMANENT change: $currentTimeZone")
+
+            success
         } catch (e: Exception) {
             Log.e(TAG, "Failed to set timezone permanently: ${e.message}", e)
-            return false
+            false
         }
     }
 
     /**
-     * Включает или отключает автоматическое определение часового пояса
-     *
-     * @param context Контекст приложения
-     * @param enabled true для включения, false для отключения
-     * @return true если операция выполнена успешно, false в противном случае
+     * Включает или отключает автоматическое определение часового пояса.
      */
     fun setAutoTimeZoneEnabled(context: Context, enabled: Boolean): Boolean {
         return try {
-            Settings.Global.putInt(context.contentResolver, Settings.Global.AUTO_TIME_ZONE, if (enabled) 1 else 0)
+            Settings.Global.putInt(
+                context.contentResolver,
+                Settings.Global.AUTO_TIME_ZONE,
+                if (enabled) 1 else 0
+            )
             Log.i(TAG, "Auto timezone detection set to ${if (enabled) "enabled" else "disabled"}")
             true
         } catch (e: Exception) {
@@ -135,10 +193,7 @@ class TimeZoneHelper {
     }
 
     /**
-     * Сохраняет выбранный часовой пояс в SharedPreferences
-     *
-     * @param context Контекст приложения
-     * @param timeZoneId Идентификатор часового пояса
+     * Сохраняет выбранный часовой пояс в SharedPreferences.
      */
     fun saveTimeZoneToPrefs(context: Context, timeZoneId: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -147,24 +202,10 @@ class TimeZoneHelper {
     }
 
     /**
-     * Получает сохраненный часовой пояс из SharedPreferences
-     *
-     * @param context Контекст приложения
-     * @return Идентификатор часового пояса или null, если ничего не сохранено
+     * Получает сохраненный часовой пояс из SharedPreferences.
      */
     fun getTimeZoneFromPrefs(context: Context): String? {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getString(TIMEZONE_KEY, null)
     }
-
-    /**
-     * Удаляет сохраненный часовой пояс из SharedPreferences
-     *
-     * @param context Контекст приложения
-     */
-    fun clearTimeZonePrefs(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().remove(TIMEZONE_KEY).apply()
-        Log.i(TAG, "TimeZone preferences cleared")
-    }
-} 
+}
