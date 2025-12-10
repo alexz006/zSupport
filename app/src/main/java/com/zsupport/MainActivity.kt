@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.zsupport.helpers.AppHelper
@@ -35,6 +36,9 @@ import kotlinx.coroutines.cancel
 import com.zsupport.helpers.UIHelper
 
 /**
+ *
+ * gradlew assembleRelease -Dorg.gradle.java.home="C:\Program Files\Android\Android Studio\jbr"
+ *
  * MainActivity - основной класс приложения, реализующий управление системными настройками
  * автомобильного головного устройства.
  *
@@ -100,31 +104,111 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val agreementLayout = findViewById<LinearLayout>(R.id.agreementLayout)
+        val mainContentLayout = findViewById<LinearLayout>(R.id.mainContentLayout)
+
         // Получаем ссылки на элементы из XML
         val chineseButton = findViewById<Button>(R.id.chineseButton)
         val englishButton = findViewById<Button>(R.id.englishButton)
         val agreementCheckBox = findViewById<CheckBox>(R.id.checkBox)
         val timezoneButton = findViewById<Button>(R.id.timezoneButton)
         val autoDetectCheckbox = findViewById<CheckBox>(R.id.autoDetectTimezoneCheckbox)
-        val radioGroupTimezone = findViewById<RadioGroup>(R.id.radioGroupTimezone)
 
         val appSelector = findViewById<AutoCompleteTextView>(R.id.appSelector)
         val clearCacheButton = findViewById<Button>(R.id.clearCacheButton)
         val clearDataButton = findViewById<Button>(R.id.clearDataButton)
         val forceStopButton = findViewById<Button>(R.id.forceStopButton)
-        val keyboardSelectButton = findViewById<ImageButton>(R.id.keyboardButton)
         val versionTextView = findViewById<TextView>(R.id.versionTextView)
 
         val usbModeSwitcher = findViewById<SegmentedButtonGroup>(R.id.usbModeSwitcher)
 
+        // Меню
+        val menuLocaleButton = findViewById<Button>(R.id.menuLocaleButton)
+        val menuUsbButton = findViewById<Button>(R.id.menuUsbButton)
+        val menuTimezoneButton = findViewById<Button>(R.id.menuTimezoneButton)
+        val menuAppsButton = findViewById<Button>(R.id.menuAppsButton)
+        val menuKeyboardButton = findViewById<Button>(R.id.menuKeyboardButton)
+        val menuOtherButton = findViewById<Button>(R.id.menuOtherButton)
+
+        // Секции контента
+        val sectionLocale = findViewById<View>(R.id.sectionLocale)
+        val sectionUsb = findViewById<View>(R.id.sectionUsb)
+        val sectionTimezone = findViewById<View>(R.id.sectionTimezone)
+        val sectionApps = findViewById<View>(R.id.sectionApps)
+        val sectionKeyboard = findViewById<View>(R.id.sectionKeyboard)
+        val sectionOther = findViewById<View>(R.id.sectionOther)
+
+        // Элементы управления клавиатурой в секции Keyboard
+        val currentInputMethodTextView = findViewById<TextView>(R.id.currentInputMethodTextView)
+        val gboardButton = findViewById<Button>(R.id.gboardButton)
+        val yandexButton = findViewById<Button>(R.id.yandexButton)
+        val microsoftButton = findViewById<Button>(R.id.msswiftButton)
+        val testInputEditText = findViewById<EditText>(R.id.testInputEditText)
+
+        val keyboardManager = KeyboardManager.getInstance()
+
+        // Локальная функция для обновления UI статуса клавиатуры
+        fun updateKeyboardUI() {
+            val currentId = keyboardManager.getCurrentKeyboard(this)
+            val currentName = when (currentId) {
+                "com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME" ->
+                    "Gboard"
+                "ru.yandex.androidkeyboard/com.android.inputmethod.latin.LatinIME" ->
+                    "Yandex Keyboard"
+                "com.touchtype.swiftkey/com.touchtype.KeyboardService" ->
+                    "Microsoft Swift"
+                else -> "Unknown"
+            }
+            currentInputMethodTextView.text = getString(R.string.current_input_method, currentName)
+            val buttons = mapOf(
+                "Gboard" to gboardButton,
+                "Yandex Keyboard" to yandexButton,
+                "Microsoft Swift" to microsoftButton
+            )
+            buttons.forEach { (name, button) ->
+                if (name == currentName) {
+                    button.setBackgroundResource(R.drawable.custom_button_selected_background)
+                } else {
+                    button.setBackgroundResource(R.drawable.custom_button_background)
+                }
+            }
+        }
+        // Обработчики кнопок выбора клавиатуры
+        gboardButton.setOnClickListener {
+            keyboardManager.configureAndSelectKeyboard(this, "Gboard")
+            updateKeyboardUI()
+        }
+        yandexButton.setOnClickListener {
+            keyboardManager.configureAndSelectKeyboard(this, "Yandex Keyboard")
+            updateKeyboardUI()
+        }
+        microsoftButton.setOnClickListener {
+            keyboardManager.configureAndSelectKeyboard(this, "Microsoft Swift")
+            updateKeyboardUI()
+        }
+        // Стартовое обновление UI (когда откроется секция Keyboard, всё уже будет корректно)
+        updateKeyboardUI()
+
         // Устанавливаем текст версии приложения
+        //val appVersion = SystemHelper.getAppVersion(this)
+        //versionTextView.text = "v${appVersion}"
         val appVersion = SystemHelper.getAppVersion(this)
-        versionTextView.text = "v${appVersion}"
+        val osVersion = try {
+            Settings.Global.getString(contentResolver, "b22_current_version")
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to read b22_current_version: ${e.message}", e)
+            null
+        }
+        versionTextView.text = if (!osVersion.isNullOrEmpty()) {
+            "v$appVersion | OS: $osVersion"
+        } else {
+            "v$appVersion"
+        }
 
         val prefs = applicationContext.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
         // Настраиваем эффект при наведении для кнопок
-        HoverUtils().setHover(chineseButton, englishButton, timezoneButton, clearCacheButton, clearDataButton, forceStopButton, keyboardSelectButton)
+        HoverUtils().setHover(chineseButton, englishButton, timezoneButton, clearCacheButton, clearDataButton, forceStopButton)
 
         // Начально деактивируем кнопки
         chineseButton.isEnabled = false
@@ -143,6 +227,15 @@ class MainActivity : AppCompatActivity() {
             updateButtonState(clearCacheButton, isChecked)
             updateButtonState(clearDataButton, isChecked)
             updateButtonState(forceStopButton, isChecked)
+
+            // пока нет согласия — интерфейс скрыт
+            if (isChecked) {
+                agreementLayout.visibility = View.GONE
+                mainContentLayout.visibility = View.VISIBLE
+            } else {
+                agreementLayout.visibility = View.VISIBLE
+                mainContentLayout.visibility = View.GONE
+            }
         }
 
         // Настраиваем действия для кнопок
@@ -155,106 +248,100 @@ class MainActivity : AppCompatActivity() {
             hideKeyboard()
         }
 
-        // Получаем список всех доступных часовых поясов
-        val timeZoneIds = TimeZone.getAvailableIDs()
+        // Формируем список часовых поясов в формате, как в питоне: GMT-12..GMT+12
+        val gmtTimeZones = (-12..12).map { i ->
+            val hours = if (i >= 0) "$i" else String.format("%d", i) // без ведущего нуля
+            "GMT" + (if (i >= 0) "+" else "") + hours
+        }
 
-        Log.i(TAG, "Timezone IDs: ${timeZoneIds.size}")
-        Log.i(TAG, "Timezone IDs: ${timeZoneIds}")
+        // Логируем список для отладки
+        Log.i(TAG, "GMT timezones: $gmtTimeZones")
 
-        // Преобразуем ID часовых поясов в читаемый формат
-        val readableTimeZones = timeZoneIds
-            .map { timeZoneId -> Pair(timeZoneId, timeZoneHelper.getReadableTimeZone(timeZoneId)) } // Создаем пары (ID, читаемый формат)
-            .sortedBy { TimeZone.getTimeZone(it.first).rawOffset } // Сортируем по смещению
-            .map { it.second } // Оставляем только читаемый формат
+        // Адаптер для выпадающего списка
+        val adapter = ArrayAdapter(this, R.layout.custom_spinner_item, gmtTimeZones)
 
-        val mutableTimeZoneIds = readableTimeZones.toMutableList() // Создаём изменяемую копию списка
+        // Настраиваем поле выбора часового пояса как селект (без ввода текста)
+        val timezoneAutoComplete = findViewById<AutoCompleteTextView>(R.id.timezoneAutoComplete)
+        timezoneAutoComplete.setAdapter(adapter)
+        timezoneAutoComplete.threshold = Int.MAX_VALUE // отключаем поиск по вводу
 
-        // Создаем адаптер для выпадающего списка с фильтрацией
-        val adapter = object : ArrayAdapter<String>(this, R.layout.custom_spinner_item, mutableTimeZoneIds) {
-            override fun getFilter(): Filter {
-                return object : Filter() {
-                    override fun performFiltering(constraint: CharSequence?): FilterResults {
-                        val filteredList = if (constraint.isNullOrEmpty()) {
-                            readableTimeZones
-                        } else {
-                            readableTimeZones.filter { it.contains(constraint, ignoreCase = true) }
-                        }
+        // Делаем поле «только выбор из списка»
+        timezoneAutoComplete.keyListener = null
+        timezoneAutoComplete.isFocusable = false
+        timezoneAutoComplete.isCursorVisible = false
+        timezoneAutoComplete.hint = getString(R.string.select_timezone_hint)
 
-                        return FilterResults().apply {
-                            values = filteredList
-                        }
-                    }
-
-
-                    @Suppress("UNCHECKED_CAST")
-                    override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                        val filteredList = results?.values as? List<String> ?: emptyList()
-                        clear() // Очищаем текущий список адаптера
-                        addAll(filteredList) // Добавляем отфильтрованные значения
-                        notifyDataSetChanged()
-                    }
-                }
+        timezoneAutoComplete.setOnClickListener {
+            timezoneAutoComplete.showDropDown()
+        }
+        timezoneAutoComplete.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                timezoneAutoComplete.showDropDown()
             }
         }
 
-        // Настраиваем поле выбора часового пояса
-        val timezoneAutoComplete = findViewById<AutoCompleteTextView>(R.id.timezoneAutoComplete)
-        timezoneAutoComplete.setAdapter(adapter)
-        timezoneAutoComplete.threshold = 1 // Поиск начинается после ввода первого символа
-        timezoneAutoComplete.hint = getString(R.string.select_timezone_hint)
+        // Определяем текущий системный часовой пояс через helper (учитывает persist.sys.timezone)
+        val currentSystemTimeZoneId = timeZoneHelper.getCurrentSystemTimeZoneId(this)
 
-        // Загружаем сохраненный часовой пояс, если он существует
+        val currentSystemTz = TimeZone.getTimeZone(currentSystemTimeZoneId)
+        val currentOffsetHours = currentSystemTz.rawOffset / (60 * 60 * 1000)
+        val currentGmtTz = "GMT" + (if (currentOffsetHours >= 0) "+" else "") + currentOffsetHours.toString()
+
+        // Загружаем сохранённый часовой пояс (если есть)
         val savedTimeZone = timeZoneHelper.getTimeZoneFromPrefs(this)
-        if (!savedTimeZone.isNullOrEmpty()) {
-            timezoneAutoComplete.setText(timeZoneHelper.getReadableTimeZone(savedTimeZone))
-            radioGroupTimezone.check(R.id.radioPermanent)
-            Log.i(TAG, "Loaded saved timezone: $savedTimeZone")
+
+        // Определяем, какой ID показывать по умолчанию:
+        // 1) если сохранённый есть — используем его, при необходимости конвертируем в GMT±H
+        // 2) иначе — текущий системный в формате GMT±H
+        val initialTimeZoneId = when {
+            !savedTimeZone.isNullOrEmpty() -> {
+                if (savedTimeZone.startsWith("GMT") && gmtTimeZones.contains(savedTimeZone)) {
+                    savedTimeZone
+                } else {
+                    // Старый формат (например, Europe/Berlin) конвертируем в GMT±H
+                    val tz = TimeZone.getTimeZone(savedTimeZone)
+                    val h = tz.rawOffset / (60 * 60 * 1000)
+                    "GMT" + (if (h >= 0) "+" else "") + h.toString()
+                }
+            }
+            gmtTimeZones.contains(currentGmtTz) -> currentGmtTz
+            else -> "GMT+0"
         }
+
+        // Устанавливаем выбранный пункт без запуска фильтрации
+        timezoneAutoComplete.setText(initialTimeZoneId, false)
 
         // Настраиваем действие для кнопки изменения часового пояса
         timezoneButton.setOnClickListener {
             hideKeyboard()
 
-            val selectedTimeZoneDisplay = timezoneAutoComplete.text.toString()
+            val selectedTimeZoneDisplay = timezoneAutoComplete.text.toString().trim()
 
-            // Получаем идентификатор таймзоны на основе читаемого формата
-            val selectedTimeZoneId = timeZoneIds.find { id ->
-                timeZoneHelper.getReadableTimeZone(id) == selectedTimeZoneDisplay
+            // Проверяем, что пользователь выбрал один из GMT±H
+            val selectedTimeZoneId = if (gmtTimeZones.contains(selectedTimeZoneDisplay)) {
+                selectedTimeZoneDisplay
+            } else {
+                null
             }
 
-            if (selectedTimeZoneId != null) {
-                val isPermanent = radioGroupTimezone.checkedRadioButtonId == R.id.radioPermanent
-                if (isPermanent) {
-                    // Отключаем автоматическое определение часового пояса
-                    timeZoneHelper.setAutoTimeZoneEnabled(this, false)
-                    
-                    // Применяем постоянное изменение часового пояса
-                    val success = timeZoneHelper.setSystemTimeZonePermanent(this, selectedTimeZoneId)
-                    
-                    if (success) {
-                        // Сохраняем в настройках только если успешно установили
-                        timeZoneHelper.saveTimeZoneToPrefs(this, selectedTimeZoneId)
-                        UIHelper.showCustomToast(this@MainActivity, "Timezone permanently set to ${selectedTimeZoneDisplay}")
-                        
-                        // Проверяем текущий часовой пояс для отладки
-                        val currentTimeZone = Settings.Global.getString(contentResolver, "time_zone")
-                        Log.i(TAG, "Current timezone setting after change: $currentTimeZone")
-                    } else {
-                        UIHelper.showCustomToast(this@MainActivity, getString(R.string.invalid_timezone_selected))
-                    }
-                } else {
-                    // Временное изменение часового пояса
-                    val success = timeZoneHelper.changeSystemTimeZone(this, selectedTimeZoneId)
-                    if (success) {
-                        UIHelper.showCustomToast(this@MainActivity, "Timezone temporarily set to ${selectedTimeZoneDisplay}")
-                        timeZoneHelper.clearTimeZonePrefs(this)
-                    } else {
-                        UIHelper.showCustomToast(this@MainActivity, getString(R.string.invalid_timezone_selected))
-                    }
-                }
-            } else {
-                Log.e(TAG, "Selected timezone not found in available IDs.")
+            if (selectedTimeZoneId == null) {
                 UIHelper.showCustomToast(this@MainActivity, getString(R.string.invalid_timezone_selected))
+                return@setOnClickListener
+            }
+
+            // Всегда постоянная установка
+            val success = timeZoneHelper.setSystemTimeZonePermanent(this, selectedTimeZoneId)
+
+            if (success) {
+                UIHelper.showCustomToast(
+                    this@MainActivity,
+                    "Timezone successfully set to $selectedTimeZoneDisplay.\nReboot is required for changes to take full effect."
+                )
+            } else {
+                UIHelper.showCustomToast(
+                    this@MainActivity,
+                    getString(R.string.invalid_timezone_selected)
+                )
             }
         }
 
@@ -337,10 +424,6 @@ class MainActivity : AppCompatActivity() {
                 Log.e(TAG, "App not found: $selectedAppName")
                 UIHelper.showCustomToast(this@MainActivity, getString(R.string.select_valid_app))
             }
-        }
-
-        keyboardSelectButton.setOnClickListener {
-            KeyboardManager.getInstance().showKeyboardDialog(this)
         }
 
         //////////////////////////////////////////////////////////////////////////
@@ -434,6 +517,29 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+
+        val allSections = listOf(sectionLocale, sectionUsb, sectionTimezone, sectionApps, sectionKeyboard, sectionOther)
+
+        // По умолчанию показываем секцию локали
+        showSection(sectionLocale, allSections)
+        menuLocaleButton.setOnClickListener {
+            showSection(sectionLocale, allSections)
+        }
+        menuUsbButton.setOnClickListener {
+            showSection(sectionUsb, allSections)
+        }
+        menuTimezoneButton.setOnClickListener {
+            showSection(sectionTimezone, allSections)
+        }
+        menuAppsButton.setOnClickListener {
+            showSection(sectionApps, allSections)
+        }
+        menuKeyboardButton.setOnClickListener {
+            showSection(sectionKeyboard, allSections)
+        }
+        menuOtherButton.setOnClickListener {
+            showSection(sectionOther, allSections)
+        }
     }
 
     override fun onResume() {
@@ -509,5 +615,9 @@ class MainActivity : AppCompatActivity() {
         val style = if (isEnabled) R.style.CustomButtonStyle else R.style.CustomOFFButtonStyle
         button.setTextAppearance(this, style)
         button.background = getDrawable(if (isEnabled) R.drawable.custom_button_background else R.drawable.custom_button_off_background)
+    }
+
+    private fun showSection(active: View, all: List<View>) {
+        all.forEach { it.visibility = if (it == active) View.VISIBLE else View.GONE }
     }
 }
