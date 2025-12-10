@@ -29,4 +29,8 @@
     <string name="temporary_change">Temporary Change</string>
     <string name="permanent_change">Permanent Change</string>
     <string name="app_found_rights_granted">%1$s: найден. Права: выданы.</string>
+
+    <string name="current_input_method_unknown">Current Input Method: Unknown</string>
+    <string name="keyboard_test_hint">Tap here to test current keyboard</string>
+
 </resources>
