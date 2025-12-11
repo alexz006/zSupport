@@ -5,7 +5,9 @@ import android.app.backup.BackupManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -138,6 +140,9 @@ class MainActivity : AppCompatActivity() {
         val sectionKeyboard = findViewById<View>(R.id.sectionKeyboard)
         val sectionOther = findViewById<View>(R.id.sectionOther)
 
+        // Кнопка в разделе "Other"
+        val selectLauncherButton = findViewById<Button>(R.id.selectLauncherButton)
+
         // Элементы управления клавиатурой в секции Keyboard
         val currentInputMethodTextView = findViewById<TextView>(R.id.currentInputMethodTextView)
         val gboardButton = findViewById<Button>(R.id.gboardButton)
@@ -208,7 +213,16 @@ class MainActivity : AppCompatActivity() {
         val prefs = applicationContext.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
         // Настраиваем эффект при наведении для кнопок
-        HoverUtils().setHover(chineseButton, englishButton, timezoneButton, clearCacheButton, clearDataButton, forceStopButton)
+        // Настраиваем эффект при наведении для кнопок
+        HoverUtils().setHover(
+            chineseButton,
+            englishButton,
+            timezoneButton,
+            clearCacheButton,
+            clearDataButton,
+            forceStopButton,
+            selectLauncherButton
+        )
 
         // Начально деактивируем кнопки
         chineseButton.isEnabled = false
@@ -218,6 +232,78 @@ class MainActivity : AppCompatActivity() {
         clearDataButton.isEnabled = false
         forceStopButton.isEnabled = false
 
+        selectLauncherButton.setOnClickListener {
+            val pm = packageManager
+
+            // Базовый HOME-интент
+            val homeIntent = Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_HOME)
+                addCategory(Intent.CATEGORY_DEFAULT)
+            }
+
+            // Пытаемся узнать текущий дефолтный лаунчер
+            val resolveInfo = try {
+                pm.resolveActivity(homeIntent, PackageManager.MATCH_DEFAULT_ONLY)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to resolve default home activity: ${e.message}", e)
+                null
+            }
+
+            if (resolveInfo != null && resolveInfo.activityInfo != null) {
+                val homePackage = resolveInfo.activityInfo.packageName
+                Log.i(TAG, "Current default launcher package: $homePackage")
+
+                var cleared = false
+                try {
+                    // Работает только для системных/привилегированных приложений
+                    pm.clearPackagePreferredActivities(homePackage)
+                    cleared = true
+                    Log.i(TAG, "Preferred activities for $homePackage cleared")
+                } catch (se: SecurityException) {
+                    Log.w(TAG, "No permission to clear preferred activities: ${se.message}", se)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to clear preferred activities: ${e.message}", e)
+                }
+
+                if (!cleared) {
+                    // Открываем настройки лаунчера, чтобы пользователь мог сам сбросить "по умолчанию"
+                    try {
+                        val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:$homePackage")
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        startActivity(settingsIntent)
+
+                        UIHelper.showCustomToast(
+                            this@MainActivity,
+                            "В настройках лаунчера сбросьте «по умолчанию», затем вернитесь и снова нажмите кнопку."
+                        )
+                        return@setOnClickListener
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to open launcher app settings: ${e.message}", e)
+                    }
+                }
+            } else {
+                Log.w(TAG, "No default home activity resolved")
+            }
+
+            // Теперь отправляем обычный HOME-интент.
+            // Если дефолт сброшен — система покажет стандартный выбор лаунчера.
+            try {
+                val intent = Intent(Intent.ACTION_MAIN).apply {
+                    addCategory(Intent.CATEGORY_HOME)
+                    addCategory(Intent.CATEGORY_DEFAULT)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start HOME intent: ${e.message}", e)
+                UIHelper.showCustomToast(
+                    this@MainActivity,
+                    "Не удалось открыть выбор лаунчера на этой системе"
+                )
+            }
+        }
         // Настраиваем действие для чекбокса
         agreementCheckBox.setOnCheckedChangeListener { _, isChecked ->
             // Активируем или деактивируем кнопки в зависимости от состояния чекбокса
@@ -578,6 +664,16 @@ class MainActivity : AppCompatActivity() {
     private fun changeSystemLanguage(locale: Locale) {
         Log.i(TAG, "Changing system language to $locale")
 
+        // Сохраняем выбранный язык для применения после перезагрузки устройства
+        try {
+            val prefs = applicationContext.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            prefs.edit()
+                .putString("preferred_language", locale.language) // ТОЛЬКО language, без country
+                .apply()
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to save preferred language: ${e.message}", e)
+        }
+
         try {
             val amnClass = Class.forName("android.app.ActivityManagerNative")
             val amnInstance = amnClass.getMethod("getDefault").invoke(null)
@@ -595,7 +691,6 @@ class MainActivity : AppCompatActivity() {
 
             BackupManager.dataChanged("com.android.providers.settings")
             Log.i(TAG, "System language updated successfully.")
-
         } catch (e: Exception) {
             Log.e(TAG, "Failed to change language: ${e.message}", e)
         }
@@ -620,4 +715,50 @@ class MainActivity : AppCompatActivity() {
     private fun showSection(active: View, all: List<View>) {
         all.forEach { it.visibility = if (it == active) View.VISIBLE else View.GONE }
     }
+
+    // Класс для сохранения настроек
+    companion object {
+        private const val PREFS_NAME = "app_prefs"
+        private const val KEY_PREFERRED_LANGUAGE = "preferred_language"
+
+        // Вызывается ресивером при BOOT_COMPLETED
+        fun applySavedLanguage(context: Context) {
+            try {
+                val prefs = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                val lang = prefs.getString(KEY_PREFERRED_LANGUAGE, null)
+
+                if (lang.isNullOrEmpty()) {
+                    Log.i("AnyAppSupport", "No saved language, skipping applySavedLanguage")
+                    return
+                }
+
+                val locale = Locale(lang)
+                Log.i("AnyAppSupport", "Applying saved language on boot: $locale")
+
+                try {
+                    val amnClass = Class.forName("android.app.ActivityManagerNative")
+                    val amnInstance = amnClass.getMethod("getDefault").invoke(null)
+
+                    val config = amnInstance.javaClass
+                        .getMethod("getConfiguration")
+                        .invoke(amnInstance) as Configuration
+
+                    config.locale = locale
+                    config.javaClass.getField("userSetLocale").setBoolean(config, true)
+
+                    amnInstance.javaClass
+                        .getMethod("updateConfiguration", Configuration::class.java)
+                        .invoke(amnInstance, config)
+
+                    BackupManager.dataChanged("com.android.providers.settings")
+                    Log.i("AnyAppSupport", "System language reapplied from prefs on boot.")
+                } catch (e: Exception) {
+                    Log.e("AnyAppSupport", "Failed to apply saved language on boot: ${e.message}", e)
+                }
+            } catch (e: Exception) {
+                Log.e("AnyAppSupport", "applySavedLanguage error: ${e.message}", e)
+            }
+        }
+    }
+
 }
